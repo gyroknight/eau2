@@ -9,6 +9,10 @@ add_subdirectory(tests)
 add_custom_target(test
     COMMAND ./tests/test_main
     DEPENDS test_main
-    COMMENT 
 )
 
+# PHONY target to run valgrind
+add_custom_target(valgrind
+    COMMAND valgrind --leak-check=full --tool=memcheck ./tests/test_main
+    DEPENDS test_main
+)
