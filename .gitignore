@@ -1,3 +1,4 @@
 *.gch
 .vscode/
 *.swp
+build/
