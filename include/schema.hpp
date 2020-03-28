@@ -14,13 +14,13 @@
  */
 class Schema {
    private:
-    std::vector<std::string*> __rowNames;  // names of rows
-    std::vector<std::string*> __colNames;  // names of columns
-    std::vector<char> __colTypes;          // types of columns
+    std::vector<std::string*> _rowNames;  // names of rows
+    std::vector<std::string*> _colNames;  // names of columns
+    std::vector<char> _colTypes;          // types of columns
 
    public:
     /** Copying constructor */
-    Schema(Schema& from);
+    Schema(const Schema& from);
 
     /** Create an empty schema **/
     Schema();
@@ -34,32 +34,32 @@ class Schema {
     /** Add a column of the given type and name (can be nullptr), name
      * is external. Names are expectd to be unique, duplicates result
      * in undefined behavior. */
-    void add_column(char typ, std::string* name);
+    void add_column(char typ, std::string name);
 
     /** Add a row with a name (possibly nullptr), name is external.  Names
      * are expectd to be unique, duplicates result in undefined behavior. */
-    void add_row(std::string* name);
+    void add_row(std::string name);
 
     /** Return name of row at idx; nullptr indicates no name. An idx >=
      * width is undefined. */
-    std::string* row_name(size_t idx);
+    std::string row_name(size_t idx);
 
     /** Return name of column at idx; nullptr indicates no name given.
      *  An idx >= width is undefined.*/
-    std::string* col_name(size_t idx);
+    std::string col_name(size_t idx) const;
 
     /** Return type of column at idx. An idx >= width is undefined. */
-    char col_type(size_t idx);
+    char col_type(size_t idx) const;
 
     /** Given a column name return its index, or -1. */
-    int col_idx(const char* name);
+    int col_idx(const char* name) const;
 
     /** Given a row name return its index, or -1. */
-    int row_idx(const char* name);
+    int row_idx(const char* name) const;
 
     /** The number of columns */
-    size_t width();
+    size_t width() const;
 
     /** The number of rows */
-    size_t length();
+    size_t length() const;
 };

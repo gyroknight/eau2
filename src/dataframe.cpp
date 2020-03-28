@@ -2,42 +2,38 @@
 
 /** Create a data frame with the same columns as the given df but with no
  * rows or rownmaes */
-DataFrame::DataFrame(DataFrame& df) : DataFrame(df.__schema) {}
+DataFrame::DataFrame(const DataFrame& df) : DataFrame(df._schema) {}
 
 /** Create a data frame from a schema and columns. All columns are created
  * empty. */
-DataFrame::DataFrame(Schema& schema) {
+DataFrame::DataFrame(const Schema schema) {
     char type;
     for (size_t ii = 0; ii < schema.width(); ii++) {
         type = schema.col_type(ii);
         switch (type) {
             case 'I':
-                __data.push_back(new Column<int>());
+                _data.emplace_back(new Column<int>());
                 break;
             case 'B':
-                __data.push_back(new Column<bool>());
+                _data.emplace_back(new Column<bool>());
                 break;
             case 'D':
-                __data.push_back(new Column<double>());
+                _data.emplace_back(new Column<double>());
                 break;
             case 'S':
-                __data.push_back(new Column<std::string>());
+                _data.emplace_back(new Column<std::string>());
                 break;
         }
 
-        __schema.add_column(type, schema.col_name(ii));
+        _schema.add_column(type, schema.col_name(ii));
     }
 }
 
-DataFrame::~DataFrame() {
-    for (ColumnInterface* col : __data) {
-        if (col) delete col;
-    }
-}
+DataFrame::~DataFrame() {}
 
 /** Returns the dataframe's schema. Modifying the schema after a dataframe
  * has been created in undefined. */
-Schema& DataFrame::getSchema() { return __schema; }
+Schema& DataFrame::getSchema() { return _schema; }
 
 int DataFrame::getInt(size_t col, size_t row) { return getVal<int>(col, row); }
 
@@ -58,14 +54,14 @@ std::string& DataFrame::getString(size_t col, size_t row) {
  * dataframe, results are undefined.
  */
 void DataFrame::fillRow(size_t idx, Row& row) {
-    if (idx >= __schema.length()) {
+    if (idx >= _schema.length()) {
         printf("Out of range row index: %zu\n", idx);
         return;
     }
 
     row.setIdx(idx);
-    for (size_t ii = 0; ii < __schema.width(); ii++) {
-        switch (__schema.col_type(ii)) {
+    for (size_t ii = 0; ii < _schema.width(); ii++) {
+        switch (_schema.col_type(ii)) {
             case 'I':
                 row.set(ii, getInt(ii, idx));
                 break;
@@ -85,40 +81,40 @@ void DataFrame::fillRow(size_t idx, Row& row) {
 /** Add a row at the end of this dataframe. The row is expected to have
  *  the right schema and be filled with values, otherwise undedined.  */
 void DataFrame::add_row(Row& row) {
-    for (size_t ii = 0; ii < __schema.width(); ii++) {
-        switch (__schema.col_type(ii)) {
+    for (size_t ii = 0; ii < _schema.width(); ii++) {
+        switch (_schema.col_type(ii)) {
             case 'I':
-                dynamic_cast<Column<int>&>(*__data[ii])
+                dynamic_cast<Column<int>&>(*_data[ii])
                     .push_back(row.getInt(ii));
                 break;
             case 'B':
-                dynamic_cast<Column<bool>&>(*__data[ii])
+                dynamic_cast<Column<bool>&>(*_data[ii])
                     .push_back(row.getBool(ii));
                 break;
             case 'D':
-                dynamic_cast<Column<double>&>(*__data[ii])
+                dynamic_cast<Column<double>&>(*_data[ii])
                     .push_back(row.getDouble(ii));
                 break;
             case 'S':
-                dynamic_cast<Column<std::string&>&>(*__data[ii])
+                dynamic_cast<Column<std::string&>&>(*_data[ii])
                     .push_back(row.getString(ii));
                 break;
         }
     }
 
-    __schema.add_row(nullptr);
+    _schema.add_row(nullptr);
 }
 
 /** The number of rows in the dataframe. */
-size_t DataFrame::nrows() { return __schema.length(); }
+size_t DataFrame::nrows() { return _schema.length(); }
 
 /** The number of columns in the dataframe.*/
-size_t DataFrame::ncols() { return __schema.width(); }
+size_t DataFrame::ncols() { return _schema.width(); }
 
 /** Visit rows in order */
 void DataFrame::map(Rower& r) {
-    for (size_t ii = 0; ii < __schema.length(); ii++) {
-        Row row{__schema};
+    for (size_t ii = 0; ii < _schema.length(); ii++) {
+        Row row{_schema};
         fillRow(ii, row);
         r.accept(row);
     }
@@ -127,10 +123,10 @@ void DataFrame::map(Rower& r) {
 /** Create a new dataframe, constructed from rows for which the given Rower
  * returned true from its accept method. */
 DataFrame& DataFrame::filter(Rower& r) {
-    DataFrame* ret = new DataFrame(__schema);
+    DataFrame* ret = new DataFrame(_schema);
 
-    for (size_t ii = 0; ii < __schema.length(); ii++) {
-        Row row = {__schema};
+    for (size_t ii = 0; ii < _schema.length(); ii++) {
+        Row row = {_schema};
         fillRow(ii, row);
         if (r.accept(row)) ret->add_row(row);
     }
@@ -144,7 +140,7 @@ void DataFrame::pmap(Rower& r) {
     // try to get the max number of threads this configuration can run
     unsigned int numThreads = std::thread::hardware_concurrency();
     numThreads = numThreads ? numThreads : 4;  // default to 4
-    size_t length = __schema.length();
+    size_t length = _schema.length();
     size_t partitionSize = length / numThreads;  // partition between threads
 
     while (partitionSize < 1 && numThreads > 1) {
@@ -163,7 +159,7 @@ void DataFrame::pmap(Rower& r) {
     // use a lambda to map one thread's deligated partition
     auto partialMap = [this](Rower& rower, size_t start, size_t end) {
         for (size_t ii = start; ii < end; ii++) {
-            Row row{__schema};
+            Row row{_schema};
             fillRow(ii, row);
             rower.accept(row);
         }

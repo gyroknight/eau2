@@ -6,7 +6,7 @@ add_subdirectory(src)
 add_subdirectory(tests)
 
 # PHONY target to run tests
-add_custom_target(test
+add_custom_target(run_test
     COMMAND ./tests/test_main
     DEPENDS test_main
 )

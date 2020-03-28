@@ -30,6 +30,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+include_directories(../include)
 add_executable(test_main test.cpp)
 target_link_libraries(test_main gtest_main)
 enable_testing()

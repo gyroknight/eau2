@@ -9,31 +9,50 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <variant>
+
+#define COL_VARIANTS int, bool, float, std::string
 
 /****************************************************************************
  * DataFrame::
  *
  * A DataFrame is table composed of columns of equal length. Each column
- * holds values of the same type (I, S, B, F). A dataframe has a schema that
- * describes it.
+ * holds values of the same type (int, std::string, bool, or float). A dataframe
+ * has a schema that describes it.
  */
 class DataFrame {
    private:
-    Schema __schema;
-    std::vector<ColumnInterface*> __data;
+    Schema _schema;
+    std::vector<std::shared_ptr<ColumnInterface>> _data;
 
     template <typename T>
     T getVal(size_t col, size_t row);
 
    public:
-    /** Create a data frame with the same columns as the given df but with no
-     * rows or rownmaes */
-    DataFrame(DataFrame& df);
 
     /** Create a data frame from a schema and columns. All columns are created
      * empty. */
     DataFrame(Schema& schema);
 
+    /** 
+     * Copy constructor - Create a data frame with the same columns as the given
+     * df but with no rows or rownames
+     */
+    DataFrame(const DataFrame& df);
+    
+    /**
+     * Move constructor - moves schema and data
+     */
+    DataFrame(DataFrame&& df);
+
+    /**
+     * Creates an empty dataframe with the same column names as the schema
+     */
+    DataFrame(const Schema schema);
+
+    /**
+     * Destroy the Data Frame object
+     */
     ~DataFrame();
 
     /** Returns the dataframe's schema. Modifying the schema after a dataframe
@@ -44,7 +63,7 @@ class DataFrame {
      * is external, and appears as the last column of the dataframe, the
      * name is optional and external. A nullptr colum is undefined. */
     template <typename T>
-    void addCol(Column<T>& col, std::string* name);
+    void addCol(Column<T>& col, std::string name);
 
     /** Return the value at the given column and row. Accessing rows or
      *  columns out of bounds, or request the wrong type is undefined.*/
