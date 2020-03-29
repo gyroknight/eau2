@@ -18,7 +18,7 @@ template <typename T>
 Column<T>::Column(const Column<T>& other) : _data(), _size() {
     _data.reserve(other._data.size());
 
-    // fill new vector with new unique ptrs to objects
+    // fill new vector with new ptrs to objects
     for (const auto& e : other._data) {
         _data.push_back(e);
     }
