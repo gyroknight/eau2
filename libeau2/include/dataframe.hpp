@@ -1,17 +1,22 @@
 // lang::Cpp
 #pragma once
 
+#include <string>
+#include <thread>
+#include <variant>
+#include <vector>
+
 #include "column.hpp"
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"
 
-#include <string>
-#include <thread>
-#include <vector>
-#include <variant>
-
 #define COL_VARIANTS int, bool, float, std::string
+
+using ExtString = std::shared_ptr<std::string>;
+
+class KVStore;
+class Key;
 
 /****************************************************************************
  * DataFrame::
@@ -22,33 +27,27 @@
  */
 class DataFrame {
    private:
-    Schema _schema;
-    std::vector<std::shared_ptr<ColumnInterface>> _data;
+    Schema __schema;
+    std::vector<std::shared_ptr<ColumnInterface>> __data;
 
     template <typename T>
     T getVal(size_t col, size_t row);
 
    public:
-
     /** Create a data frame from a schema and columns. All columns are created
      * empty. */
-    DataFrame(Schema& schema);
+    DataFrame(const Schema& schema);
 
-    /** 
+    /**
      * Copy constructor - Create a data frame with the same columns as the given
      * df but with no rows or rownames
      */
     DataFrame(const DataFrame& df);
-    
+
     /**
      * Move constructor - moves schema and data
      */
     DataFrame(DataFrame&& df);
-
-    /**
-     * Creates an empty dataframe with the same column names as the schema
-     */
-    DataFrame(const Schema schema);
 
     /**
      * Destroy the Data Frame object
@@ -73,7 +72,7 @@ class DataFrame {
 
     double getDouble(size_t col, size_t row);
 
-    std::string& getString(size_t col, size_t row);
+    ExtString getString(size_t col, size_t row);
 
     /** Set the value at the given column and row to the given value.
      * If the column is not  of the right type or the indices are out of
@@ -107,6 +106,31 @@ class DataFrame {
     /** This method clones the Rower and executes the map in parallel. Join is
      * used at the end to merge the results. */
     void pmap(Rower& r);
+
+    /**
+     * @brief Creates a single-column DataFrame from the array provided and
+     * stores it in the key-value store at the key provided.
+     *
+     * @tparam T
+     * @param key
+     * @param kv
+     * @param size
+     * @param array
+     */
+    template <typename T>
+    static void fromArray(Key* key, KVStore* kv, size_t size, T* array);
+
+    /**
+     * @brief Creates a single-column, single-item DataFrame with the value
+     * provided and stores it in the key-value store at the key provided.
+     *
+     * @tparam T
+     * @param key
+     * @param kv
+     * @param value
+     */
+    template <typename T>
+    static void fromScalar(Key* key, KVStore* kv, T value);
 };
 
 #include "dataframe.tpp"

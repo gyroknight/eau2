@@ -2,22 +2,18 @@
 #pragma once
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
-
-#include <memory>
 
 #include "chunk.hpp"
 
 class ColumnInterface {
    public:
-    virtual ~ColumnInterface() {};
+    virtual ~ColumnInterface(){};
 
     /** Returns the number of elements in the column. */
     virtual size_t size() const = 0;
-
-    /** Returns a character "B", "I", "F", "S" based on which column we're using */
-    virtual char type() const = 0;
 };
 
 /**
@@ -30,8 +26,8 @@ class ColumnInterface {
 template <typename T>
 class Column : public ColumnInterface {
    private:
-    std::vector<std::shared_ptr<Chunk<T>>> _data;  // vector of chunks
-    size_t _size;
+    std::vector<std::shared_ptr<Chunk<T>>> __data;  // vector of chunks
+    size_t __size;
 
    public:
     // construct a column
@@ -58,8 +54,6 @@ class Column : public ColumnInterface {
 
     /** Returns the number of elements in the column. */
     virtual size_t size() const override;
-
-    virtual char type() const override;
 };
 
 #include "column.tpp"

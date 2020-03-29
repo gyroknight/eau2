@@ -1,7 +1,10 @@
 // lang::CwC
 #pragma once
 
+#include <memory>
 #include <string>
+
+using ExtString = std::shared_ptr<std::string>;
 
 /*****************************************************************************
  * Fielder::
@@ -17,7 +20,7 @@ class Fielder {
     virtual void accept(bool b) = 0;
     virtual void accept(double d) = 0;
     virtual void accept(int i) = 0;
-    virtual void accept(std::string& s) = 0;
+    virtual void accept(ExtString s) = 0;
 
     /** Called when all fields have been seen. */
     virtual void done() {}

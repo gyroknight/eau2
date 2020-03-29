@@ -2,7 +2,6 @@
 
 #include "column.hpp"
 #include "dataframe.hpp"
-
 #include "gtest/gtest.h"
 
 namespace {
@@ -141,6 +140,8 @@ TYPED_TEST(ColumnTest, set_many) {
 // }
 
 // get_type
-TYPED_TEST(ColumnTest, get_type) { EXPECT_EQ('I', this->_col->type()); }
+TYPED_TEST(ColumnTest, get_type) {
+    EXPECT_EQ('I', Schema::colToType(*this->_col));
+}
 
 }  // namespace

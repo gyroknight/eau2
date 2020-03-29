@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "column.hpp"
+
 /*************************************************************************
  * Schema::
  * A schema is a description of the contents of a data frame, the schema
@@ -14,9 +16,9 @@
  */
 class Schema {
    private:
-    std::vector<std::string*> _rowNames;  // names of rows
-    std::vector<std::string*> _colNames;  // names of columns
-    std::vector<char> _colTypes;          // types of columns
+    std::vector<std::string> __rowNames;  // names of rows
+    std::vector<std::string> __colNames;  // names of columns
+    std::vector<char> __colTypes;         // types of columns
 
    public:
     /** Copying constructor */
@@ -33,8 +35,11 @@ class Schema {
 
     /** Add a column of the given type and name (can be nullptr), name
      * is external. Names are expectd to be unique, duplicates result
-     * in undefined behavior. */
-    void add_column(char typ, std::string name);
+     * in undefined behavior.
+     * Returns whether the column was added to the schema succesfully (whether
+     * the type is supported).
+     */
+    bool add_column(char typ, std::string name);
 
     /** Add a row with a name (possibly nullptr), name is external.  Names
      * are expectd to be unique, duplicates result in undefined behavior. */
@@ -42,7 +47,7 @@ class Schema {
 
     /** Return name of row at idx; nullptr indicates no name. An idx >=
      * width is undefined. */
-    std::string row_name(size_t idx);
+    std::string row_name(size_t idx) const;
 
     /** Return name of column at idx; nullptr indicates no name given.
      *  An idx >= width is undefined.*/
@@ -62,4 +67,9 @@ class Schema {
 
     /** The number of rows */
     size_t length() const;
+
+    template <typename T>
+    static char colToType(const Column<T>& col);
 };
+
+#include "schema.tpp"

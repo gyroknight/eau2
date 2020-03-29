@@ -4,6 +4,7 @@
 #include "fielder.hpp"
 #include "schema.hpp"
 
+using ExtString = std::shared_ptr<std::string>;
 /*************************************************************************
  * Row::
  *
@@ -33,7 +34,7 @@ class Row {
     void set(size_t col, bool val);
 
     // String is external
-    void set(size_t col, std::string& val);
+    void set(size_t col, ExtString val);
 
     /** Set/get the index of this row (ie. its position in the dataframe. This
      * is only used for informational purposes, unused otherwise */
@@ -46,7 +47,7 @@ class Row {
     int getInt(size_t col);
     bool getBool(size_t col);
     double getDouble(size_t col);
-    std::string& getString(size_t col);
+    ExtString getString(size_t col);
 
     /** Number of fields in the row. */
     size_t width();

@@ -55,7 +55,7 @@ void Row::set(size_t col, bool val) {
 }
 
 // String is external
-void Row::set(size_t col, std::string& val) {
+void Row::set(size_t col, ExtString val) {
     if (__schema.col_type(col) != 'S') {
         std::cerr << "Column " << col << " is not string" << std::endl;
         return;
@@ -82,8 +82,8 @@ size_t Row::getIdx() { return __idx; }
 int Row::getInt(size_t col) { return *static_cast<int*>(__data[col]); }
 bool Row::getBool(size_t col) { return *static_cast<bool*>(__data[col]); }
 double Row::getDouble(size_t col) { return *static_cast<double*>(__data[col]); }
-std::string& Row::getString(size_t col) {
-    return *static_cast<std::string*>(__data[col]);
+ExtString Row::getString(size_t col) {
+    return *static_cast<ExtString*>(__data[col]);
 }
 
 /** Number of fields in the row. */
