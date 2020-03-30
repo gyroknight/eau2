@@ -22,16 +22,14 @@ class Row {
     
     // TODO this is pretty ugly
     std::vector<std::variant<
-        std::shared_ptr<int>,
-        std::shared_ptr<double>,
-        std::shared_ptr<bool>,
+        int,
+        double,
+        bool,
         ExtString>> __data;
 
    public:
     /** Build a row following a schema. */
     Row(Schema& scm);
-
-    ~Row();
 
     /** Setters: set the given column with the given value. Setting a column
      * with a value of the wrong type is undefined. */
@@ -52,9 +50,9 @@ class Row {
 
     /** Getters: get the value at the given column. If the column is not
      * of the requested type, the result is undefined. */
-    std::shared_ptr<int> getInt(size_t col);
-    std::shared_ptr<bool> getBool(size_t col);
-    std::shared_ptr<double> getDouble(size_t col);
+    int getInt(size_t col);
+    bool getBool(size_t col);
+    double getDouble(size_t col);
     ExtString getString(size_t col);
 
     /** Number of fields in the row. */

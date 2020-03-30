@@ -7,36 +7,20 @@ Row::Row(Schema& scm) : __schema(scm), __idx(0), __data(scm.width()) {}
 /** Setters: set the given column with the given value. Setting a column
  * with a value of the wrong type is undefined. */
 void Row::set(size_t col, int val) {
-    if (auto pval = std::get_if<int>(&__data[col])) {
-        *pval = val;
-    } else {
-        std::cerr << "Column " << col << " is not integer" << std::endl;
-    }
+    __data[col] = val;
 }
 
 void Row::set(size_t col, double val) {
-    if (auto pval = std::get_if<double>(&__data[col])) {
-        *pval = val;
-    } else {
-        std::cerr << "Column " << col << " is not double" << std::endl;
-    }
+    __data[col] = val;
 }
 
 void Row::set(size_t col, bool val) {
-    if (auto pval = std::get_if<bool>(&__data[col])) {
-        *pval = val;
-    } else {
-        std::cerr << "Column " << col << " is not bool" << std::endl;
-    }
+    __data[col] = val;
 }
 
 // String is external
 void Row::set(size_t col, ExtString val) {
-    if (auto pval = std::get_if<ExtString>(&__data[col])) {
-        *pval = val;
-    } else {
-        std::cerr << "Column " << col << " is not ExtString" << std::endl;
-    }
+    __data[col] = val;
 }
 
 /** Set/get the index of this row (ie. its position in the dataframe. This
@@ -54,17 +38,17 @@ size_t Row::getIdx() { return __idx; }
 
 /** Getters: get the value at the given column. If the column is not
  * of the requested type, the result is undefined. */
-std::shared_ptr<int> Row::getInt(size_t col) {
-    return std::get<std::shared_ptr<int>>(__data[col]);
+int Row::getInt(size_t col) {
+    return std::get<int>(__data.at(col));
 }
-std::shared_ptr<bool> Row::getBool(size_t col) {
-    return std::get<std::shared_ptr<bool>>(__data[col]);
+bool Row::getBool(size_t col) {
+    return std::get<bool>(__data.at(col));
 }
-std::shared_ptr<double> Row::getDouble(size_t col) {
-    return std::get<std::shared_ptr<double>>(__data[col]);
+double Row::getDouble(size_t col) {
+    return std::get<double>(__data.at(col));
 }
 ExtString Row::getString(size_t col) {
-    return std::get<ExtString>(__data[col]);
+    return std::get<ExtString>(__data.at(col));
 }
 
 /** Number of fields in the row. */
@@ -97,11 +81,14 @@ void Row::visit(size_t idx, Fielder& f) {
             case 'B':
                 f.accept(getBool(ii));
                 break;
-            case 'F':
+            case 'D':
                 f.accept(getDouble(ii));
                 break;
             case 'S':
                 f.accept(getString(ii));
+                break;
+            default:
+                std::cerr << "Unsupported type '" << type << "'" << std::endl;
                 break;
         }
     }
