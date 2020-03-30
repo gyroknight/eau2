@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "column.test.hpp"
+#include "column_int.test.hpp"
 
 int main(int argc, char** argv) {
     std::cout << "test" << std::endl;

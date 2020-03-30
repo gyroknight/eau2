@@ -14,6 +14,9 @@ class ColumnInterface {
 
     /** Returns the number of elements in the column. */
     virtual size_t size() const = 0;
+
+    /** Returns the column as a string "1, 2, 3, 4" */
+    virtual std::string str() const = 0;
 };
 
 /**
@@ -44,7 +47,7 @@ class Column : public ColumnInterface {
     Column(std::initializer_list<T> ll);
 
     // Get a value at the given index
-    T get(size_t idx);
+    T get(size_t idx) const;
 
     // Set value at idx. An out of bound idx is undefined
     void set(size_t idx, T val);
@@ -54,6 +57,9 @@ class Column : public ColumnInterface {
 
     /** Returns the number of elements in the column. */
     virtual size_t size() const override;
+
+    /** Returns the column as a string "1, 2, 3, 4" */
+    virtual std::string str() const override;
 };
 
 #include "column.tpp"
