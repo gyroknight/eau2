@@ -2,6 +2,8 @@
 
 #include "gtest/gtest.h"
 #include "column_int.test.hpp"
+#include "schema.test.hpp"
+#include "row-fielder.test.hpp"
 
 int main(int argc, char** argv) {
     std::cout << "test" << std::endl;

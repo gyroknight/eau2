@@ -9,7 +9,7 @@ Schema::Schema() {}
 
 Schema::Schema(const char* types) {
     while (*types) {
-        add_column(*types, nullptr);
+        add_column(*types, "");
         types++;
     }
 }
@@ -21,9 +21,10 @@ bool Schema::add_column(char typ, std::string name) {
         case 'I':
         case 'D':
             __colTypes.push_back(typ);
+            __colNames.push_back(name);
             return true;
         default:
-            std::cerr << "Unknown column type" << std::endl;
+            std::cerr << "Unknown column type '" << typ << "'" << std::endl;
             return false;
     }
 }

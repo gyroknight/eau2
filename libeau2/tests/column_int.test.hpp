@@ -8,15 +8,17 @@
 
 namespace {
 
-// Fixture with some useful methods
+// Fixture with some useful methods - this can be inherited from and used to set up several different tests
 class IntColumnTest : public testing::Test {
    protected:
     std::shared_ptr<Column<int>> ic;
 
+    // Helper method to add random ints to the column
     void AddRandom(size_t n) {
         while (n--) ic->push_back(rand());
     }
 
+    // Helper method to add sequential ints to the column
     void AddSequential(size_t n) {
         for (size_t i = 0; i < n; i++) ic->push_back(static_cast<int>(i));
     }
@@ -137,11 +139,13 @@ class IntColumnEqual : public IntColumnTest {
 
 // Testing int columns constructed with initializer lists
 
+// Fixture with a single element column
 class IntColumnVaSingle : public IntColumnTest {
    public:
     IntColumnVaSingle() { ic = std::make_shared<Column<int>>(std::initializer_list<int>{42}); }
 };
 
+// Fixture with a 250-element column
 class IntColumnVaMany : public IntColumnTest {
    public:
     IntColumnVaMany() {

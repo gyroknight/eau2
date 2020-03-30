@@ -86,15 +86,15 @@ void DataFrame::add_row(Row& row) {
         switch (__schema.col_type(ii)) {
             case 'I':
                 dynamic_cast<Column<int>&>(*__data[ii])
-                    .push_back(row.getInt(ii));
+                    .push_back(*row.getInt(ii));
                 break;
             case 'B':
                 dynamic_cast<Column<bool>&>(*__data[ii])
-                    .push_back(row.getBool(ii));
+                    .push_back(*row.getBool(ii));
                 break;
             case 'D':
                 dynamic_cast<Column<double>&>(*__data[ii])
-                    .push_back(row.getDouble(ii));
+                    .push_back(*row.getDouble(ii));
                 break;
             case 'S':
                 dynamic_cast<Column<ExtString>&>(*__data[ii])

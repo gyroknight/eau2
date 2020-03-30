@@ -17,9 +17,9 @@ class Fielder {
     virtual void start(size_t r) {}
 
     /** Called for fields of the argument's type with the value of the field. */
-    virtual void accept(bool b) = 0;
-    virtual void accept(double d) = 0;
-    virtual void accept(int i) = 0;
+    virtual void accept(std::shared_ptr<bool> b) = 0;
+    virtual void accept(std::shared_ptr<double> d) = 0;
+    virtual void accept(std::shared_ptr<int> i) = 0;
     virtual void accept(ExtString s) = 0;
 
     /** Called when all fields have been seen. */
