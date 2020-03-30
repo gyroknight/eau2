@@ -29,8 +29,3 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
-
-add_executable(test_main test.cpp)
-target_link_libraries(test_main eau2 gtest_main)
-enable_testing()
-add_test(NAME run_test COMMAND test_main)

@@ -9,14 +9,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+add_subdirectory(test_common)
 add_subdirectory(libeau2)
-add_subdirectory(tests)
-# add_subdirectory(demo)
 
-# PHONY target to run tests
+# PHONY target to run all tests TODO(mike) make this smarter
 add_custom_target(test
-    COMMAND ./tests/test_main
-    DEPENDS test_main
+    COMMAND ./libeau2/tests/libeau2_test
+    DEPENDS libeau2_test
 )
 
 # PHONY target to run valgrind

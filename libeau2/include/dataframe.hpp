@@ -29,6 +29,8 @@ class DataFrame {
    private:
     Schema __schema;
     std::vector<std::shared_ptr<ColumnInterface>> __data;
+    size_t
+        offset;  // Represents where in the database this DataFrame is located
 
     template <typename T>
     T getVal(size_t col, size_t row);

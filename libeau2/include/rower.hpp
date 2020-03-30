@@ -1,6 +1,7 @@
 // lang::Cpp
 #pragma once
 
+#include <memory>
 #include "row.hpp"
 
 /*******************************************************************************
@@ -11,6 +12,8 @@
  */
 class Rower {
    public:
+    virtual ~Rower() {};
+
     /** This method is called once per row. The row object is on loan and
         should not be retained as it is likely going to be reused in the next
         call. The return value is used in filters to indicate that a row
@@ -23,6 +26,6 @@ class Rower {
        method is reponsible for cleaning up memory. */
     virtual void join_delete(Rower* other) = 0;
 
-    //! Creates a copy of the current Rower
-    virtual Rower& clone() = 0;
+    //! Creates a copy of the current Rower TODO smart pointer
+    virtual Rower* clone() = 0;
 };

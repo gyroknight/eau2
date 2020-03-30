@@ -1,7 +1,10 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "test_column.hpp"
+#include "column_int.test.hpp"
+#include "schema.test.hpp"
+#include "row-fielder.test.hpp"
+// #include "dataframe.test.hpp" // Not working for some reason
 
 int main(int argc, char** argv) {
     std::cout << "test" << std::endl;

@@ -1,6 +1,8 @@
 // lang::Cpp
 #pragma once
 
+#include <variant>
+
 #include "fielder.hpp"
 #include "schema.hpp"
 
@@ -17,13 +19,17 @@ class Row {
    private:
     Schema& __schema;
     size_t __idx;
-    std::vector<void*> __data;
+    
+    // TODO this is pretty ugly
+    std::vector<std::variant<
+        int,
+        double,
+        bool,
+        ExtString>> __data;
 
    public:
     /** Build a row following a schema. */
     Row(Schema& scm);
-
-    ~Row();
 
     /** Setters: set the given column with the given value. Setting a column
      * with a value of the wrong type is undefined. */

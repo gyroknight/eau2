@@ -3,20 +3,22 @@
 #include <cassert>
 #include <cstddef>
 
+#include <sstream>
+
 namespace {}  // namespace
 
 template <class T>
-inline Column<T>::Column() : __size(0) {}
+Column<T>::Column() : __size(0) {}
 
 template <typename T>
-inline Column<T>::Column(Column<T>&& other)
+Column<T>::Column(Column<T>&& other)
     : __data(std::move(other.__data)), __size() {
     other.__data.clear();
     other.__data.shrink_to_fit();
 }
 
 template <typename T>
-inline Column<T>::Column(const Column<T>& other) : __size(other.__size) {
+Column<T>::Column(const Column<T>& other) : __size(other.__size) {
     __data.reserve(other.__data.size());
 
     // fill new vector with new ptrs to objects
@@ -26,10 +28,16 @@ inline Column<T>::Column(const Column<T>& other) : __size(other.__size) {
 }
 
 template <typename T>
-inline Column<T>::Column(std::initializer_list<T> ll) : __data(ll), __size() {}
+Column<T>::Column(std::initializer_list<T> ll) : __size() {
+    __data.reserve(ll.size());
+
+    for (const auto& e : ll) {
+        push_back(e);
+    }
+}
 
 template <typename T>
-inline T Column<T>::get(size_t idx) {
+T Column<T>::get(size_t idx) const {
     size_t chunkIdx = idx / Chunk<T>::size();
     size_t itemIdx = idx % Chunk<T>::size();
 
@@ -37,7 +45,7 @@ inline T Column<T>::get(size_t idx) {
 }
 
 template <typename T>
-inline void Column<T>::set(size_t idx, T val) {
+void Column<T>::set(size_t idx, T val) {
     // same logic as get for index logic
     size_t chunkIdx = idx / Chunk<T>::size();
     size_t itemIdx = idx % Chunk<T>::size();
@@ -46,7 +54,7 @@ inline void Column<T>::set(size_t idx, T val) {
 }
 
 template <typename T>
-inline void Column<T>::push_back(T val) {
+void Column<T>::push_back(T val) {
     size_t chunkIdx;
     size_t itemIdx = __size++ % Chunk<T>::size();
     if (itemIdx == 0) {
@@ -60,4 +68,18 @@ inline void Column<T>::push_back(T val) {
 template <typename T>
 size_t Column<T>::size() const {
     return __size;
+}
+
+template <typename T>
+std::string Column<T>::str() const {
+    std::stringstream ss;
+
+    for (size_t i = 0; i < size(); i++) {
+        ss << get(i);
+        if (i != size() - 1) {
+            ss << ", ";
+        }
+    }
+
+    return ss.str();
 }

@@ -166,7 +166,7 @@ void DataFrame::pmap(Rower& r) {
         if (ii == numThreads - 1)
             rowers[ii] = &r;
         else
-            rowers[ii] = &r.clone();
+            rowers[ii] = r.clone();
 
         start = (numThreads - ii - 1) * partitionSize;
         end = ii == 0 ? length : start + partitionSize;
