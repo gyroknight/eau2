@@ -1,0 +1,2 @@
+add_executable(libeau2_test test.cpp)
+target_link_libraries(libeau2_test eau2 gtest_main)
