@@ -123,6 +123,7 @@ How can we make the system more ergonomic to use?
 
 Much of the basic framework is written (if not functional currently), but there are missing things and a lot of polishing that needs to be done.
 
+- It doesn't build (91% works :) )
 - DataFrames are mostly working, but there are potentially still some bugs.
 - We do not have a network layer implemented.
 - Our KVStore is mostly implemented, but has serious problems. The local storage is fine, but the distributed storage is broken.
