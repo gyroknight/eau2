@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "column.hpp"
+#include "key.hpp"
+#include "kvstore.hpp"
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"
@@ -14,9 +16,6 @@
 #define COL_VARIANTS int, bool, float, std::string
 
 using ExtString = std::shared_ptr<std::string>;
-
-class KVStore;
-class Key;
 
 /****************************************************************************
  * DataFrame::
@@ -36,6 +35,8 @@ class DataFrame {
     T getVal(size_t col, size_t row);
 
    public:
+    DataFrame();
+
     /** Create a data frame from a schema and columns. All columns are created
      * empty. */
     DataFrame(const Schema& schema);
@@ -64,7 +65,7 @@ class DataFrame {
      * is external, and appears as the last column of the dataframe, the
      * name is optional and external. A nullptr colum is undefined. */
     template <typename T>
-    void addCol(Column<T>& col, std::string name);
+    void addCol(std::shared_ptr<Column<T>> col, ExtString name = nullptr);
 
     /** Return the value at the given column and row. Accessing rows or
      *  columns out of bounds, or request the wrong type is undefined.*/

@@ -11,6 +11,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(test_common)
 add_subdirectory(libeau2)
+add_subdirectory(demo)
 
 # PHONY target to run all tests TODO(mike) make this smarter
 add_custom_target(test

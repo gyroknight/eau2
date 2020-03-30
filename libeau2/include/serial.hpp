@@ -18,6 +18,9 @@ enum class Type {
     Float = 8,
     Double = 9,
     String = 10,
+    Column = 11,
+    Key = 12,
+    DataFrame = 13,
     Unknown
 };
 
@@ -45,6 +48,12 @@ Type valueToType(uint8_t value) {
             return Type::Double;
         case static_cast<uint8_t>(Type::String):
             return Type::String;
+        case static_cast<uint8_t>(Type::Column):
+            return Type::Column;
+        case static_cast<uint8_t>(Type::Key):
+            return Type::Key;
+        case static_cast<uint8_t>(Type::DataFrame):
+            return Type::DataFrame;
         default:
             return Type::Unknown;
     }
@@ -74,6 +83,12 @@ uint8_t typeToValue(Type type) {
             return static_cast<uint8_t>(Type::Double);
         case Type::String:
             return static_cast<uint8_t>(Type::String);
+        case Type::Column:
+            return static_cast<uint8_t>(Type::Column);
+        case Type::Key:
+            return static_cast<uint8_t>(Type::Key);
+        case Type::DataFrame:
+            return static_cast<uint8_t>(Type::DataFrame);
         default:
             return UINT8_MAX;
     }

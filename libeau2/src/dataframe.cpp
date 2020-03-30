@@ -1,5 +1,7 @@
 #include "dataframe.hpp"
 
+DataFrame::DataFrame() : DataFrame(Schema()) {}
+
 /** Create a data frame with the same columns as the given df but with no
  * rows or rownmaes */
 DataFrame::DataFrame(const DataFrame& df) : DataFrame(df.__schema) {}
