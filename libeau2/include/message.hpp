@@ -25,6 +25,7 @@ enum class MsgKind {
     Unknown
 };
 
+// Communication messages between KV stores
 class Message {
    private:
     MsgKind __kind;     // the message kind

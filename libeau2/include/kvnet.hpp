@@ -4,6 +4,7 @@
 
 #include "message.hpp"
 
+// Interface for facilitating communication between distributed stores
 class KVNet {
    public:
     virtual size_t registerNode() = 0;

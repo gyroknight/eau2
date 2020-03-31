@@ -2,6 +2,7 @@
 
 #include "message.hpp"
 
+// Shuts down a KV store when received.
 class Kill : public Message {
    public:
     Kill(uint64_t sender, uint64_t target);

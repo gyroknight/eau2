@@ -9,6 +9,7 @@
 
 using ExtString = std::shared_ptr<std::string>;
 
+// Serialized data to include with messages
 class Payload {
    private:
     Serial::Type __type = Serial::Type::Unknown;

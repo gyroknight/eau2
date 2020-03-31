@@ -5,6 +5,8 @@
 #include "key.hpp"
 #include "message.hpp"
 
+// Get data from another KV store, ranging from entire DataFrames to single
+// values
 class Get : public Message {
    private:
     Key __key;

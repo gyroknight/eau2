@@ -7,6 +7,7 @@
 #include "message.hpp"
 #include "payload.hpp"
 
+// Data requested by another node
 class Reply : public Message {
    public:
     Serial::Type __type;

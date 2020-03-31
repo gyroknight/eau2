@@ -4,6 +4,7 @@
 #include "key.hpp"
 #include "message.hpp"
 
+// Puts data from one node to another, ranging from entire DFs to single items
 class Put : public Message {
    private:
     const Key& __key;

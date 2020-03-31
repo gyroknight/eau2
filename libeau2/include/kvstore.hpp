@@ -14,6 +14,7 @@ class DataFrame;
 
 using DFMap = std::unordered_map<Key, std::shared_ptr<DataFrame>>;
 
+// A mix of local and remote DataFrames keyed by name and node location.
 class KVStore {
    private:
     std::mutex __keyMutex;

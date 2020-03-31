@@ -9,6 +9,7 @@
 #include "payload.hpp"
 #include "serial.hpp"
 
+// Builds a serial bytestream of items
 class Serializer {
    private:
     std::unique_ptr<std::vector<uint8_t>> __bytestream =
