@@ -19,6 +19,8 @@ inline T DataFrame::getVal(size_t col, size_t row) {
     // cast column interface down to correct type
     auto dfcol = std::dynamic_pointer_cast<Column<T>>(_data.at(col));
 
+    if (!dfcol) throw std::runtime_error("Attempted to getVal as wrong type");
+
     return dfcol->get(row);
 }
 
@@ -42,7 +44,6 @@ inline void DataFrame::fromArray(Key* key, KVStore* kv, size_t size, T* array) {
     auto df = std::make_shared<DataFrame>();
     df->addCol(col);
 
-    kv->insert(*key, df);
     kv->push(*key, df);
 }
 

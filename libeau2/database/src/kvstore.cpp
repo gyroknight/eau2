@@ -10,7 +10,7 @@
 #include "waitandget.hpp"
 
 namespace {
-constexpr size_t WAIT_GET_TIMEOUT_S = 10;
+constexpr size_t WAIT_GET_TIMEOUT_S = 60;
 }  // namespace
 
 KVStore::KVStore(KVNet& kvNet) : _kvNet(kvNet) {
@@ -24,45 +24,51 @@ KVStore::~KVStore() {
 }
 
 void KVStore::insert(const Key& key, std::shared_ptr<DataFrame> value) {
-    if (_validKeys.count(key)) {
+    std::shared_lock<std::shared_mutex> readLock(_storeMutex);
+    if (_store.count(key)) {
         std::cerr << "Key " << key.name() << " already exists on node " << _idx
                   << ".\n";
         return;
     }
+    readLock.unlock();
 
+    const std::lock_guard<std::shared_mutex> writeLock(_storeMutex);
     _store[key] = value;
-
-    const std::lock_guard<std::mutex> lockKeys(_keyMutex);
-    _validKeys.insert(key);
     _cv.notify_all();
 }
 
 std::shared_ptr<DataFrame> KVStore::waitAndGet(const Key& key) {
-    std::unique_lock<std::mutex> lockKeys(_keyMutex);
+    std::shared_lock<std::shared_mutex> lock(_storeMutex);
 
-    if (_validKeys.count(key)) {
+    if (_store.count(key)) {
         return _store[key];
     }
 
     fetch(key, true);
 
-    if (_cv.wait_for(lockKeys, std::chrono::seconds(WAIT_GET_TIMEOUT_S),
-                     [this, &key] { return _validKeys.count(key) == 1; })) {
-        std::shared_ptr<DataFrame> ret = _store[key];
-        lockKeys.release();
-        return ret;
+    if (_cv.wait_for(lock, std::chrono::seconds(WAIT_GET_TIMEOUT_S),
+                     [this, &key] { return _store.count(key) == 1; })) {
+        return _store[key];
     } else {
-        std::cout << "Request timed out, unable to find dataframe."
-                  << std::endl;
+        std::cerr << "Request timed out, unable to find dataframe.\n";
         return nullptr;
     }
 }
+
 void KVStore::fetch(const Key& key, bool wait) {
     if (key.home() != _idx) {
-        if (wait)
-            _kvNet.send(std::make_shared<WaitAndGet>(_idx, key.home(), key));
-        else
-            _kvNet.send(std::make_shared<Get>(_idx, key.home(), key));
+        const std::lock_guard<std::mutex> lock(_pendingMutex);
+        if (wait) {
+            auto msg = std::make_shared<WaitAndGet>(_idx, key.home(), key);
+            _pending.insert({msg->id(), msg});
+            _kvNet.send(msg);
+            std::cout << "Requested " << key.name() << " from node "
+                      << key.home() << " with ID " << msg->id() << std::endl;
+        } else {
+            auto msg = std::make_shared<Get>(_idx, key.home(), key);
+            _pending.insert({msg->id(), msg});
+            _kvNet.send(msg);
+        }
     }
 }
 
@@ -84,6 +90,10 @@ void KVStore::_listen() {
         std::shared_ptr<Put> putMsg;
 
         if (msg) {
+            std::cout << "Node " << _idx << " received message ID " << msg->id()
+                      << " with type "
+                      << std::to_string(Message::msgKindToValue(msg->kind()))
+                      << std::endl;
             switch (msg->kind()) {
                 case MsgKind::Put:
                     // Temp code
@@ -97,6 +107,8 @@ void KVStore::_listen() {
                     _sendGetReply(std::dynamic_pointer_cast<Get>(msg));
                     break;
                 case MsgKind::WaitAndGet:
+                    _startWaitAndGetReply(
+                        std::dynamic_pointer_cast<WaitAndGet>(msg));
                     break;
                 case MsgKind::Kill:
                     listening = false;
@@ -115,7 +127,7 @@ void KVStore::_listen() {
 
 void KVStore::_postReply(std::shared_ptr<Reply> reply) {
     if (!reply) return;
-    _pendingMutex.lock();
+    std::lock_guard<std::mutex> lock(_pendingMutex);
     try {
         std::shared_ptr<Message> msg = _pending.at(reply->id());
 
@@ -137,19 +149,29 @@ void KVStore::_postReply(std::shared_ptr<Reply> reply) {
     } catch (const std::out_of_range& e) {
         std::cerr << "No pending message with ID " << reply->id() << '\n';
     }
-
-    _pendingMutex.unlock();
 }
 
 void KVStore::_sendGetReply(std::shared_ptr<Get> msg) {
-    const std::lock_guard<std::mutex> lock(_keyMutex);
-    if (_validKeys.count(msg->key())) {
+    const std::shared_lock<std::shared_mutex> lock(_storeMutex);
+    if (_store.count(msg->key())) {
         std::shared_ptr<DataFrame> df = _store[msg->key()];
         if (msg->colIdx() == UINT64_MAX && msg->rowIdx() == UINT64_MAX) {
             auto reply =
                 std::make_shared<Reply>(_idx, msg->sender(), msg->id());
             reply->setPayload(df);
             _kvNet.send(reply);
+            std::cout << "Node " << _idx << " sent reply with ID " << msg->id()
+                      << std::endl;
         }
     }
+}
+
+void KVStore::_startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg) {
+    auto asyncResponse = [this, msg]() {
+        std::shared_ptr<DataFrame> df = waitAndGet(msg->key());
+        _sendGetReply(msg);
+    };
+
+    std::thread thread(asyncResponse);
+    thread.detach();
 }

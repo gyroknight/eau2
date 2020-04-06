@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
@@ -13,25 +14,26 @@
 class DataFrame;
 class Get;
 class Reply;
+class WaitAndGet;
 
 using DFMap = std::unordered_map<Key, std::shared_ptr<DataFrame>>;
 
 // A mix of local and remote DataFrames keyed by name and node location.
 class KVStore {
    private:
-    std::mutex _keyMutex;
-    std::unordered_set<Key> _validKeys;
+    std::shared_mutex _storeMutex;
     DFMap _store;
     KVNet& _kvNet;
     std::thread _listener;
     size_t _idx;
-    std::condition_variable _cv;
+    std::condition_variable_any _cv;
     std::unordered_map<uint64_t, std::shared_ptr<Message>> _pending;
     std::mutex _pendingMutex;
 
     void _listen();
     void _postReply(std::shared_ptr<Reply> reply);
     void _sendGetReply(std::shared_ptr<Get> msg);
+    void _startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg);
 
    public:
     KVStore(KVNet& kvNet);

@@ -18,6 +18,11 @@ inline bool Schema::addCol(const Column<T>& col, ExtString name) {
 
 // specializations
 template <>
+inline char Schema::colToType(const Column<long>& col) {
+    return 'L';
+}
+
+template <>
 inline char Schema::colToType(const Column<int>& col) {
     return 'I';
 }

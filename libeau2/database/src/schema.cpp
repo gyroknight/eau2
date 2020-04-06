@@ -18,8 +18,10 @@ bool Schema::addCol(const char type, ExtString name) {
     switch (type) {
         case 'S':
         case 'B':
+        case 'L':
         case 'I':
         case 'D':
+        case 'F':
             _colTypes.push_back(type);
             _colNames.push_back(name);
             return true;
