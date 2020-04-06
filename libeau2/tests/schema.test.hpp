@@ -17,7 +17,6 @@ class SchemaEmpty : public testing::TestWithParam<const char*> {
     size_t len;
 
     SchemaEmpty() : len(strlen(GetParam())) {}
-
 };
 
 // INSTANTIATE_TEST_SUITE_P(VariedString, SchemaEmpty,
@@ -88,26 +87,29 @@ TEST_F(SchemaTest, add_col) {
     Schema sc;
 
     for (int i = 0; i < 10000; i++) {
-        sc.add_column(col_types[i % 4], i % 2 ? "" : str("name", i));
+        sc.addCol(col_types[i % 4],
+                  std::make_shared<std::string>(i % 2 ? "" : str("name", i)));
         ASSERT_EQ(i + 1, sc.width());
     }
 
     for (int i = 0; i < 10000; i++) {
-        ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(), sc.col_name(i).c_str());
+        ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(),
+                     sc.col_name(i).c_str());
     }
 }
 
-// test add_row
-TEST_F(SchemaTest, add_row) {
+// test addRow
+TEST_F(SchemaTest, addRow) {
     Schema sc;
 
     for (int i = 0; i < 10000; i++) {
-        sc.add_row(i % 2 ? "" : str("name", i));
+        sc.addRow(std::make_shared<std::string>(i % 2 ? "" : str("name", i)));
         ASSERT_EQ(i + 1, sc.length());
     }
 
     for (int i = 0; i < 10000; i++) {
-        ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(), sc.row_name(i).c_str());
+        ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(),
+                     sc.row_name(i).c_str());
     }
 }
 
@@ -116,7 +118,8 @@ TEST_F(SchemaTest, col_idx) {
     Schema sc;
 
     for (int i = 0; i < 1000; i++) {
-        sc.add_column(col_types[i % 4], str("name", i));
+        sc.addCol(col_types[i % 4],
+                  std::make_shared<std::string>(str("name", i)));
     }
 
     for (int i = 0; i < 1000; i++) {
@@ -129,7 +132,7 @@ TEST_F(SchemaTest, row_idx) {
     Schema sc;
 
     for (int i = 0; i < 1000; i++) {
-        sc.add_row(str("name", i));
+        sc.addRow(std::make_shared<std::string>(str("name", i)));
     }
 
     for (int i = 0; i < 1000; i++) {

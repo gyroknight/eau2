@@ -60,6 +60,7 @@ size_t DemoNet::registerNode() {
     return nodeMsgs.size() - 1;
 }
 
+// Should probably be unique_ptr in the future
 void DemoNet::send(std::shared_ptr<Message> msg) {
     uint64_t target = msg->target();
     const std::lock_guard<std::mutex> targetLock(netMutexes[target]);
@@ -67,6 +68,7 @@ void DemoNet::send(std::shared_ptr<Message> msg) {
     nodeMsgs[target].push(msg);
 }
 
+// Should probably be unique_ptr in the future
 std::shared_ptr<Message> DemoNet::receive(size_t idx) {
     const std::lock_guard<std::mutex> senderLock(netMutexes[idx]);
 
@@ -76,5 +78,5 @@ std::shared_ptr<Message> DemoNet::receive(size_t idx) {
         return msg;
     }
 
-    return std::shared_ptr<Message>();
+    return nullptr;
 }

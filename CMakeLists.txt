@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+find_package(Threads REQUIRED)
+
 add_subdirectory(test_common)
 add_subdirectory(libeau2)
 add_subdirectory(demo)
