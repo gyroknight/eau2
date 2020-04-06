@@ -20,10 +20,20 @@ uint8_t Message::msgKindToValue(MsgKind kind) {
     switch (kind) {
         case MsgKind::Ack:
             return 0;
+        case MsgKind::Nack:
+            return 1;
+        case MsgKind::Put:
+            return 2;
         case MsgKind::Reply:
             return 3;
+        case MsgKind::Get:
+            return 4;
+        case MsgKind::WaitAndGet:
+            return 5;
         case MsgKind::Status:
             return 6;
+        case MsgKind::Kill:
+            return 7;
         case MsgKind::Register:
             return 8;
         case MsgKind::Directory:
@@ -37,10 +47,20 @@ MsgKind Message::valueToMsgKind(uint8_t value) {
     switch (value) {
         case 0:
             return MsgKind::Ack;
+        case 1:
+            return MsgKind::Nack;
+        case 2:
+            return MsgKind::Put;
         case 3:
             return MsgKind::Reply;
+        case 4:
+            return MsgKind::Get;
+        case 5:
+            return MsgKind::WaitAndGet;
         case 6:
             return MsgKind::Status;
+        case 7:
+            return MsgKind::Kill;
         case 8:
             return MsgKind::Register;
         case 9:

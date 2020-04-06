@@ -8,6 +8,9 @@ Put::Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,
       _colIdx(colIdx),
       _rowIdx(rowIdx) {}
 
+const Key& Put::key() { return _key; }
+std::shared_ptr<DataFrame> Put::value() { return _value; }
+
 std::unique_ptr<std::vector<uint8_t>> Put::serialize() {
     Serializer ss;
 

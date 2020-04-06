@@ -67,7 +67,11 @@ void KVStore::fetch(const Key& key, bool wait) {
 }
 
 void KVStore::push(const Key& key, std::shared_ptr<DataFrame> value) {
-    _kvNet.send(std::make_shared<Put>(_idx, key, value));
+    if (key.home() == _idx) {
+        insert(key, value);
+    } else {
+        _kvNet.send(std::make_shared<Put>(_idx, key, value));
+    }
 }
 
 void KVStore::_listen() {
@@ -76,8 +80,16 @@ void KVStore::_listen() {
     while (listening) {
         std::shared_ptr<Message> msg = _kvNet.receive(_idx);
 
+        // Temp
+        std::shared_ptr<Put> putMsg;
+
         if (msg) {
             switch (msg->kind()) {
+                case MsgKind::Put:
+                    // Temp code
+                    putMsg = std::dynamic_pointer_cast<Put>(msg);
+                    insert(putMsg->key(), putMsg->value());
+                    break;
                 case MsgKind::Reply:
                     _postReply(std::dynamic_pointer_cast<Reply>(msg));
                     break;

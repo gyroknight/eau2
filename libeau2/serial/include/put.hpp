@@ -15,5 +15,9 @@ class Put : public Message {
    public:
     Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,
         uint64_t colIdx = UINT64_MAX, uint64_t rowIdx = UINT64_MAX);
+
+    const Key& key();
+    std::shared_ptr<DataFrame> value();
+
     std::unique_ptr<std::vector<uint8_t>> serialize() override;
 };
