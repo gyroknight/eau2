@@ -12,7 +12,7 @@ Column<T>::Column() : _size(0) {}
 
 // Creates a column with the provided elements
 template <typename T>
-Column<T>::Column(std::initializer_list<T> ll) : _size(ll.size()) {
+Column<T>::Column(std::initializer_list<T> ll) : _size(0) {
     size_t chunkedSize = ll.size() / Chunk<T>::size();
     if (ll.size() % Chunk<T>::size()) chunkedSize++;
     _data.reserve(chunkedSize);
@@ -51,7 +51,7 @@ void Column<T>::push_back(T val) {
     }
 
     chunkIdx = _data.size() - 1;
-    (*_data[chunkIdx])[itemIdx] = val;
+    (*_data.at(chunkIdx)).at(itemIdx) = val;
 }
 
 /** Returns the number of elements in the column. */
