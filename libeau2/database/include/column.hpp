@@ -30,17 +30,16 @@ template <typename T>
 class Column : public ColumnInterface {
    private:
     std::vector<std::shared_ptr<Chunk<T>>> _data;  // vector of chunks
-    size_t _size;
+    size_t _size;  // number of items in the column
 
    public:
     // construct a column
     Column();
 
-    // Move constructor
+    // Columns cannot be moved from their intial instantiation
     Column(Column<T>&& other) = delete;
 
-    // Copy constructor - does not preserve internal structure, and does not
-    // copy actual T elements.
+    // Columns cannot be copied
     Column(const Column<T>& other) = delete;
 
     // Creates a column with the provided elements

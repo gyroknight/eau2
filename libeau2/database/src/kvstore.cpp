@@ -10,21 +10,27 @@
 #include "waitandget.hpp"
 
 namespace {
-constexpr size_t WAIT_GET_TIMEOUT_S = 60;
+constexpr size_t WAIT_GET_TIMEOUT_S =
+    60;  // How long to wait for network responses before failing in seconds
 }  // namespace
 
+// Constructs a KVStore using the communication layer provided
 KVStore::KVStore(KVNet& kvNet) : _kvNet(kvNet) {
     _listener = std::thread(&KVStore::_listen, this);
 }
 
+// Shuts down listener and destroys the KVStore
 KVStore::~KVStore() {
     auto msg = std::make_shared<Kill>(_idx, _idx);
     _kvNet.send(msg);
     _listener.join();
 }
 
+// Adds a DataFrame to the store at the key provided, assuming it does not
+// already exist
 void KVStore::insert(const Key& key, std::shared_ptr<DataFrame> value) {
     std::shared_lock<std::shared_mutex> readLock(_storeMutex);
+    // Currently ignores
     if (_store.count(key)) {
         std::cerr << "Key " << key.name() << " already exists on node " << _idx
                   << ".\n";

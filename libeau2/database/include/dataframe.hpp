@@ -18,21 +18,26 @@
  * DataFrame::
  *
  * A DataFrame is table composed of columns of equal length. Each column
- * holds values of the same type (int, std::string, bool, or float). A dataframe
- * has a schema that describes it.
+ * holds values of the same type (long, int, std::string, bool, double, or
+ * float). A dataframe has a schema that describes it.
  */
 class DataFrame {
    private:
-    Schema _schema;
-    std::vector<std::shared_ptr<ColumnInterface>> _data;
+    Schema _schema;  // specifies the layout of the dataframe
+    std::vector<std::shared_ptr<ColumnInterface>>
+        _data;   // columns of data in schema order
     bool local;  // Defines whether the DataFrame's contents are local or not
+                 // (DataFrame of DataFrames or local storage)
 
+    // Returns the value as the type specified, throws exception if invalid
     template <typename T>
     T getVal(size_t col, size_t row);
 
+    // gives Payload access to private fields for serialization
     friend class Payload;
 
    public:
+    // Creates an empty DataFrame
     DataFrame();
 
     /** Create a data frame from a schema and columns. All columns are created

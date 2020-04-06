@@ -42,7 +42,7 @@ Provides utilities such as `this_node()` which assigns indices to each node. Imp
 
 Provides the static methods `fromArray(arr)` and `fromScalar(scalar)` for creating single-column and single-element dataframes, e.g. for lists of data or signals/wait variables, respectively.
 
-Internally stores data in `Column<T>`s, 
+Internally stores data in `Column<T>`s,
 
 `Column<T>`: where `T` is one of `{int, double, bool, std::string}`.
 
@@ -103,9 +103,9 @@ public:
     p("The sum is  ").pln(sum);
     DataFrame::fromScalar(&verify, &kv, sum);
   }
-  
+
   // finally, summarizers just wait for the verify signal from the counter nodes
-  // and print the results. 
+  // and print the results.
   void summarizer() {
     DataFrame* result = kv.waitAndGet(verify);
     DataFrame* expected = kv.waitAndGet(check);
@@ -121,14 +121,20 @@ How can we make the system more ergonomic to use?
 
 ## Status
 
-Much of the basic framework is written (if not functional currently), but there are missing things and a lot of polishing that needs to be done.
-
-- It doesn't build (91% works :) )
+- M3 example works on "distributed" nodes
+- Multithreading is now working correctly
+- KVStore is functional
 - DataFrames are mostly working, but there are potentially still some bugs.
 - We do not have a network layer implemented.
-- Our KVStore is mostly implemented, but has serious problems. The local storage is fine, but the distributed storage is broken.
+- Distributed DataFrames still need to be added
+- Better file structure
+- Serializer is coming along
+- Major components are fully implemented
+- Communication and serialization format are pretty well-defined.
+- Listener works as expected, should be fairly easy to slot in network
+- File reader needs to be incorporated
 - Testing needs to be improved:
     - We are missing unit tests for some classes.
     - We are missing more elaborate application-layer tests.
     - Valgrind is not working.
-- There's a lot of inconsistency in the codebase regarding style and ownership.
+- There's a bit of inconsistency in the codebase regarding style and ownership.

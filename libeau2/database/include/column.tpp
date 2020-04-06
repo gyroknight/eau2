@@ -6,9 +6,11 @@
 
 namespace {}  // namespace
 
+// construct a column
 template <class T>
 Column<T>::Column() : _size(0) {}
 
+// Creates a column with the provided elements
 template <typename T>
 Column<T>::Column(std::initializer_list<T> ll) : _size(ll.size()) {
     size_t chunkedSize = ll.size() / Chunk<T>::size();
@@ -20,6 +22,7 @@ Column<T>::Column(std::initializer_list<T> ll) : _size(ll.size()) {
     }
 }
 
+// Get a value at the given index
 template <typename T>
 T Column<T>::get(size_t idx) const {
     size_t chunkIdx = idx / Chunk<T>::size();
@@ -28,6 +31,7 @@ T Column<T>::get(size_t idx) const {
     return (*_data[chunkIdx])[itemIdx];
 }
 
+// Set value at idx. An out of bound idx is undefined
 template <typename T>
 void Column<T>::set(size_t idx, T val) {
     // same logic as get for index logic
@@ -37,6 +41,7 @@ void Column<T>::set(size_t idx, T val) {
     (*_data[chunkIdx])[itemIdx] = val;
 }
 
+// Adds a value to the end of the column
 template <typename T>
 void Column<T>::push_back(T val) {
     size_t chunkIdx;
@@ -49,11 +54,13 @@ void Column<T>::push_back(T val) {
     (*_data[chunkIdx])[itemIdx] = val;
 }
 
+/** Returns the number of elements in the column. */
 template <typename T>
 size_t Column<T>::size() const {
     return _size;
 }
 
+/** Returns the column as a string "1, 2, 3, 4" */
 template <typename T>
 std::string Column<T>::str() const {
     std::stringstream ss;

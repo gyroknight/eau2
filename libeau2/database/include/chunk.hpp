@@ -3,7 +3,7 @@
 #include <array>
 
 namespace {
-constexpr size_t CHUNK_SIZE = 10;
+constexpr size_t CHUNK_SIZE = 10;  // Size per static array, adjustable
 }  // namespace
 
 // A fixed-size array of items
