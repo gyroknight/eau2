@@ -51,7 +51,7 @@ void Column<T>::push_back(T val) {
     }
 
     chunkIdx = _data.size() - 1;
-    (*_data.at(chunkIdx)).at(itemIdx) = val;
+    (*_data[chunkIdx])[itemIdx] = val;
 }
 
 /** Returns the number of elements in the column. */
