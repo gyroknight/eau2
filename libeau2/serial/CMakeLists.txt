@@ -1,7 +1,10 @@
-target_include_directories(eau2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(eau2 PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 target_sources(eau2
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ack.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/directory.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/get.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/kill.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/message.cpp"

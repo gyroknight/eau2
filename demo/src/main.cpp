@@ -4,9 +4,10 @@
 
 #include "demo.hpp"
 #include "kvstore.hpp"
+#include "kvnetTcp.hpp"
 
 int main(int argc, char* argv[]) {
-    DemoNet net;
+    KVNetTCP net;
 
     std::vector<std::shared_ptr<KVStore>> stores;
     std::vector<Demo> apps;
