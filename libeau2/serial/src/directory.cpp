@@ -17,6 +17,18 @@ uint64_t Directory::idx() { return _idx; }
 
 std::vector<struct sockaddr_in>& Directory::dir() { return _dir; }
 
+/**
+ * @brief Directory is represented in the following serial format:
+ *
+ * Command Header - see Message
+ * idx - 8 bytes
+ * nodes_count - 8 bytes
+ * nodes - nodes_count x
+ *  address - 4 bytes
+ *  port number - 2 bytes
+ *
+ * @return std::unique_ptr<std::vector<uint8_t>>
+ */
 std::unique_ptr<std::vector<uint8_t>> Directory::serialize() {
     Serializer ss;
     setupCmdHdr(ss);

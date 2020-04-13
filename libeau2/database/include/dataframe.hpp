@@ -1,4 +1,11 @@
 // lang::Cpp
+/**
+ * @file dataframe.hpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief A 2D columnar representation of data, can represent a whole set of
+ * data or a subset. DataFrames can be hosted locally or pointers to remote
+ * Dataframes.
+ */
 #pragma once
 
 #include <string>
@@ -13,7 +20,7 @@
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"
-#include "sorer/parser.h" // from 4500ne
+#include "sorer/parser.h"  // from 4500ne
 
 /****************************************************************************
  * DataFrame::
@@ -143,9 +150,10 @@ class DataFrame {
     static void fromScalar(Key* key, KVStore* kv, T value);
 
     /**
-     * @brief Creates a database from 4500ne's parsers. There's some data overhead that
-     * would be solved by refactoring our code or theirs to share the same column types.
-     * 
+     * @brief Creates a database from 4500ne's parsers. There's some data
+     * overhead that would be solved by refactoring our code or theirs to share
+     * the same column types.
+     *
      * @param key   the key in the store
      * @param kv    the store
      * @param set   the set of columns

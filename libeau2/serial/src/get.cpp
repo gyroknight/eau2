@@ -18,6 +18,16 @@ const Key& Get::key() { return _key; }
 uint64_t Get::colIdx() { return _colIdx; }
 uint64_t Get::rowIdx() { return _rowIdx; }
 
+/**
+ * @brief Get is represented as the following serial format:
+ *
+ * Command Header - see Message
+ * colIdx - 8 bytes
+ * rowIdx - 8 bytes
+ * key - see Payload
+ *
+ * @return std::unique_ptr<std::vector<uint8_t>>
+ */
 std::unique_ptr<std::vector<uint8_t>> Get::serialize() {
     Serializer ss;
 

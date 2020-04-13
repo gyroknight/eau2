@@ -1,6 +1,16 @@
 // lang::Cpp
 #include "message.hpp"
 
+#include "ack.hpp"
+#include "directory.hpp"
+#include "get.hpp"
+#include "kill.hpp"
+#include "nack.hpp"
+#include "put.hpp"
+#include "register.hpp"
+#include "reply.hpp"
+#include "waitandget.hpp"
+
 Message::Message(MsgKind kind, size_t sender, size_t target, size_t id)
     : _kind(kind), _sender(sender), _target(target), _id(id) {}
 Message::~Message() {}
@@ -12,6 +22,18 @@ uint64_t Message::id() { return _id; }
 
 size_t Message::getNextID() { return _nextID++; }
 
+/**
+ * @brief Adds the Message's Command Header to Serializer.
+ *
+ * The Command Header is represented by the following serial format:
+ *
+ * kind - 1 byte
+ * sender - 8 bytes
+ * target - 8 bytes
+ * id - 8 bytes
+ *
+ * @param s
+ */
 void Message::setupCmdHdr(Serializer& s) {
     s.add(msgKindToValue(_kind)).add(_sender).add(_target).add(_id);
 }
@@ -85,10 +107,18 @@ std::unique_ptr<Message> Message::deserialize(
 
     switch (kind) {
         case MsgKind::Ack:
+            return std::make_unique<Ack>(sender, target, id);
+        case MsgKind::Nack:
+            return std::make_unique<Nack>(sender, target, id);
+        case MsgKind::Put:
             return nullptr;
         case MsgKind::Reply:
             return nullptr;
-        case MsgKind::Status:
+        case MsgKind::Get:
+            return nullptr;
+        case MsgKind::WaitAndGet:
+            return nullptr;
+        case MsgKind::Kill:
             return nullptr;
         case MsgKind::Register:
             return nullptr;

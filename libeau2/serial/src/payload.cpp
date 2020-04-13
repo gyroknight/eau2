@@ -62,4 +62,6 @@ std::shared_ptr<DataFrame> Payload::asDataFrame() {
     return std::static_pointer_cast<DataFrame>(_ref);
 }
 
+// TODO: Lots to put here, need to show how Keys, Columns, and Dataframes are
+// encoded
 void Payload::serialize(Serializer& ss) {}

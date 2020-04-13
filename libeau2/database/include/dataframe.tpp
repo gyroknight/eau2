@@ -1,4 +1,9 @@
 // lang::Cpp
+/**
+ * @file dataframe.tpp
+ * @author Vincent Zhao
+ * @brief Template definitions for DataFrame
+ */
 #pragma once
 
 #include <exception>

@@ -7,6 +7,15 @@ Register::Register(in_addr_t address, in_port_t port)
     _context.sin_port = port;
 }
 
+/**
+ * @brief Register is represented as the following serial format:
+ *
+ * Command Header - see Message
+ * IP address - 4 bytes
+ * Port number - 2 bytes
+ *
+ * @return std::unique_ptr<std::vector<uint8_t>>
+ */
 std::unique_ptr<std::vector<uint8_t>> Register::serialize() {
     Serializer ss;
     setupCmdHdr(ss);

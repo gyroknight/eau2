@@ -1,3 +1,9 @@
+// lang::Cpp
+/**
+ * @file chunk.tpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief Template definitions for Chunk
+ */
 #pragma once
 
 #include <exception>

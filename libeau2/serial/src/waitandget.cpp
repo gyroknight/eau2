@@ -5,6 +5,17 @@ WaitAndGet::WaitAndGet(uint64_t sender, uint64_t target, const Key& key,
     : Get(MsgKind::WaitAndGet, sender, target, key, colIdx, rowIdx),
       _maxDelay(maxDelay) {}
 
+/**
+ * @brief WaitAndGet is represented as the following serial format
+ *
+ * Command Header - see Message
+ * colIdx - 8 bytes
+ * rowIdx - 8 bytes
+ * maxDelay - 4 bytes
+ * key - see Payload
+ *
+ * @return std::unique_ptr<std::vector<uint8_t>> Serial bytestream
+ */
 std::unique_ptr<std::vector<uint8_t>> WaitAndGet::serialize() {
     Serializer ss;
 

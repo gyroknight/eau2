@@ -1,4 +1,9 @@
-// lang::CwC
+// lang::Cpp
+/**
+ * @file fielder.hpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief A visitor that performs some operation on each field in a Row.
+ */
 #pragma once
 
 #include "commondefs.hpp"

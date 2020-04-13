@@ -1,3 +1,10 @@
+// lang::Cpp
+/**
+ * @file key.hpp
+ * @author Vincent Zhao
+ * @brief Represents where a DataFrame is located based on a name and node
+ * index.
+ */
 #pragma once
 
 #include <string>

@@ -5,9 +5,7 @@ target_sources(eau2
 
 add_executable(eau2-registrar "")
 target_include_directories(eau2-registrar PUBLIC 
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../serial/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../database/include")
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_link_libraries(eau2-registrar PUBLIC eau2)
 

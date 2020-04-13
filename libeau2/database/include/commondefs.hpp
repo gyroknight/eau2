@@ -1,3 +1,9 @@
+// lang::Cpp
+/**
+ * @file commondefs.hpp
+ * @author Vincent Zhao
+ * @brief Common type definitions used in DataFrames.
+ */
 #pragma once
 
 #include <memory>

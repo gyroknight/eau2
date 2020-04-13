@@ -55,7 +55,7 @@ size_t KVNetTCP::registerNode(const char* port) {
     ret = TCP::sendPacket(_sockfds[0], regMsg.serialize());
 
     // wait for directory
-    std::unique_ptr<Message> msg = readMsg(0);
+    std::unique_ptr<Message> msg = _readMsg(0);
     std::unique_ptr<Directory> dirMsg(dynamic_cast<Directory*>(msg.release()));
     if (!dirMsg) {
         throw std::runtime_error("Invalid Directory from registrar");
@@ -84,7 +84,7 @@ std::unique_ptr<Message> KVNetTCP::receive() {
     return nullptr;
 }
 
-std::unique_ptr<Message> KVNetTCP::readMsg(uint64_t idx) {
+std::unique_ptr<Message> KVNetTCP::_readMsg(uint64_t idx) {
     std::shared_lock<std::shared_mutex> lock(_sockfdsLock);
     if (!_sockfds.count(idx)) return nullptr;
     auto msg = std::make_unique<std::vector<uint8_t>>();

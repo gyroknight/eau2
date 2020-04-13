@@ -1,3 +1,9 @@
+// lang::Cpp
+/**
+ * @file column.tpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief Template definitions for Column.
+ */
 #pragma once
 
 #include <cassert>

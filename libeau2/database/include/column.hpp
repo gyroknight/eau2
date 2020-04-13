@@ -1,4 +1,9 @@
 // lang::Cpp
+/**
+ * @file column.hpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief A container representing a column of data in a DataFrame.
+ */
 #pragma once
 
 #include <array>
@@ -8,6 +13,10 @@
 
 #include "chunk.hpp"
 
+/**
+ * @brief A common interface representing a Column, allows for different Column
+ * types to be stored within the same STL containers.
+ */
 class ColumnInterface {
    public:
     virtual ~ColumnInterface(){};

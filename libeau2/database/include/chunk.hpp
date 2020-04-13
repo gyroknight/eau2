@@ -1,3 +1,9 @@
+// lang::Cpp
+/**
+ * @file chunk.hpp
+ * @author Vincent Zhao, Michael Hebert
+ * @brief A wrapper for a fixed-size array used in Columns.
+ */
 #pragma once
 
 #include <array>
