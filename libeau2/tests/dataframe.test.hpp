@@ -4,11 +4,15 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include "dataframe.hpp"
 #include "rower.hpp"
+
+#include "sorer/parser.h"
 
 // A basic Rower to sum up the elements in a row
 class SumInt : public Rower {
@@ -111,4 +115,46 @@ TEST(DataframeTest, dataframe) {
     SumInt sumInt;
     sumIntDf->map(sumInt);
     std::cout << "Normal result: " << sumInt.sum << std::endl;
+}
+
+// just a dummy implementation
+class DemoNet : public KVNet {
+   public:
+    std::vector<std::queue<std::shared_ptr<Message>>> nodeMsgs;
+    std::mutex netMutexes[3];
+
+    DemoNet() {}
+
+    size_t registerNode() override {
+        nodeMsgs.emplace_back();
+        return nodeMsgs.size() - 1;
+    }
+    void send(std::shared_ptr<Message> msg) override {
+        uint64_t target = msg->target();
+        const std::lock_guard<std::mutex> targetLock(netMutexes[target]);
+
+        nodeMsgs[target].push(msg);
+    }
+    std::shared_ptr<Message> receive(size_t idx) override {
+        const std::lock_guard<std::mutex> senderLock(netMutexes[idx]);
+
+        if (!nodeMsgs[idx].empty()) {
+            std::shared_ptr<Message> msg = nodeMsgs[idx].front();
+            nodeMsgs[idx].pop();
+            return msg;
+        }
+
+        return nullptr;
+    }
+};
+
+// test fromColumnSet method
+TEST(DataFrameTest, fromColumn) {
+    DemoNet net;
+    KVStore kv(net);
+    Key k("data", 0);
+
+    
+
+    DataFrame::fromColumnSet(k, kv, )
 }

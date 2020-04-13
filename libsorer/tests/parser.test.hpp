@@ -15,9 +15,9 @@ char* cwc_strdup(const char* src) {
 }
 
 TEST(ParserTest, stringColumn) {
-    StringColumn* col = new StringColumn();
+    ne::StringColumn* col = new ne::StringColumn();
     // Basic tests
-    ASSERT_EQ(ColumnType::STRING, col->getType());
+    ASSERT_EQ(ne::ColumnType::STRING, col->getType());
     col->append(cwc_strdup("test1"));
     col->appendMissing();
     col->append(cwc_strdup("test2"));
@@ -39,9 +39,9 @@ TEST(ParserTest, stringColumn) {
 }
 
 TEST(ParserTest, intColumn) {
-    IntegerColumn* col = new IntegerColumn();
+    ne::IntegerColumn* col = new ne::IntegerColumn();
     // Basic int tests
-    ASSERT_EQ(ColumnType::INTEGER, col->getType());
+    ASSERT_EQ(ne::ColumnType::INTEGER, col->getType());
     col->appendMissing();
     col->appendMissing();
     col->append(1);
@@ -54,9 +54,9 @@ TEST(ParserTest, intColumn) {
 }
 
 TEST(ParserTest, floatColumn) {
-    FloatColumn* col = new FloatColumn();
+    ne::FloatColumn* col = new ne::FloatColumn();
     // Basic float tests
-    ASSERT_EQ(ColumnType::FLOAT, col->getType());
+    ASSERT_EQ(ne::ColumnType::FLOAT, col->getType());
     col->append(4500.0);
     col->appendMissing();
     col->appendMissing();
@@ -68,9 +68,9 @@ TEST(ParserTest, floatColumn) {
 }
 
 TEST(ParserTest, boolColumn) {
-    BoolColumn* col = new BoolColumn();
+    ne::BoolColumn* col = new ne::BoolColumn();
     // Basic bool tests
-    ASSERT_EQ(ColumnType::BOOL, col->getType());
+    ASSERT_EQ(ne::ColumnType::BOOL, col->getType());
     col->append(true);
     col->append(false);
     col->appendMissing();
@@ -83,12 +83,12 @@ TEST(ParserTest, boolColumn) {
 
 TEST(ParserTest, strSlice) {
     const char* test_str = "abcde   5.2  100 test";
-    StrSlice slice1{test_str, 17, 21};
+    ne::StrSlice slice1{test_str, 17, 21};
     ASSERT_EQ(4, slice1.getLength());
     ASSERT_EQ('t', slice1.getChar(0));
     ASSERT_EQ('e', slice1.getChar(1));
 
-    StrSlice slice2{test_str, 5, 12};
+    ne::StrSlice slice2{test_str, 5, 12};
     slice2.trim(' ');
     ASSERT_EQ('5', slice2.getChar(0));
     ASSERT_EQ('2', slice2.getChar(2));
@@ -97,13 +97,13 @@ TEST(ParserTest, strSlice) {
     delete[] cstr;
     ASSERT_EQ(5.2f, slice2.toFloat());
 
-    StrSlice slice3{test_str, 13, 16};
+    ne::StrSlice slice3{test_str, 13, 16};
     ASSERT_EQ(100, slice3.toInt());
 
-    StrSlice slice4{"-128", 0, 4};
+    ne::StrSlice slice4{"-128", 0, 4};
     ASSERT_EQ(-128, slice4.toInt());
 
-    StrSlice slice5{"+437896", 0, 5};
+    ne::StrSlice slice5{"+437896", 0, 5};
     ASSERT_EQ(4378, slice5.toInt());
 }
 
@@ -133,20 +133,20 @@ class FileTest : public ::testing::Test {
 TEST_F(FileTest, dataTest) {
     LoadFile("data.sor");
     
-    SorParser parser(file, 0, fsize, fsize);
+    ne::SorParser parser(file, 0, fsize, fsize);
 
     parser.guessSchema();
     parser.parseFile();
 
-    ColumnSet* set = parser.getColumnSet();
+    ne::ColumnSet* set = parser.getColumnSet();
 
-    ASSERT_EQ(ColumnType::BOOL, set->getColumn(0)->getType());
-    ASSERT_EQ(ColumnType::INTEGER, set->getColumn(1)->getType());
-    ASSERT_EQ(ColumnType::STRING, set->getColumn(2)->getType());
+    ASSERT_EQ(ne::ColumnType::BOOL, set->getColumn(0)->getType());
+    ASSERT_EQ(ne::ColumnType::INTEGER, set->getColumn(1)->getType());
+    ASSERT_EQ(ne::ColumnType::STRING, set->getColumn(2)->getType());
 
-    BoolColumn* boolcol = dynamic_cast<BoolColumn*>(set->getColumn(0));
-    IntegerColumn* intcol = dynamic_cast<IntegerColumn*>(set->getColumn(1));
-    StringColumn* strcol = dynamic_cast<StringColumn*>(set->getColumn(2));
+    ne::BoolColumn* boolcol = dynamic_cast<ne::BoolColumn*>(set->getColumn(0));
+    ne::IntegerColumn* intcol = dynamic_cast<ne::IntegerColumn*>(set->getColumn(1));
+    ne::StringColumn* strcol = dynamic_cast<ne::StringColumn*>(set->getColumn(2));
 
     ASSERT_EQ(false, boolcol->getEntry(0));
     ASSERT_EQ(true, boolcol->getEntry(1));

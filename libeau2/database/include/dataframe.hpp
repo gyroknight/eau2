@@ -13,6 +13,7 @@
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"
+#include "parser.h" // from 4500ne
 
 /****************************************************************************
  * DataFrame::
@@ -35,6 +36,9 @@ class DataFrame {
 
     // gives Payload access to private fields for serialization
     friend class Payload;
+
+    template <typename T>
+    static void fillColumn(std::shared_ptr<Column<T>> col, T* arr, size_t size);
 
    public:
     // Creates an empty DataFrame
@@ -137,6 +141,16 @@ class DataFrame {
      */
     template <typename T>
     static void fromScalar(Key* key, KVStore* kv, T value);
+
+    /**
+     * @brief Creates a database from 4500ne's parsers. There's some data overhead that
+     * would be solved by refactoring our code or theirs to share the same column types.
+     * 
+     * @param key   the key in the store
+     * @param kv    the store
+     * @param set   the set of columns
+     */
+    static void fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set);
 };
 
 #include "dataframe.tpp"
