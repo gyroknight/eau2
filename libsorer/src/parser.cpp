@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "parser.h"
-#include "column.h"
+#include "sorer/parser.h"
+#include "sorer/column.h"
 
 namespace ne {
 

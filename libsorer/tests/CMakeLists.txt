@@ -4,7 +4,7 @@ target_include_directories(libsorer_test PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
 # target_link_libraries(libsorer_test sorer)
-target_link_libraries(libsorer_test gtest_main)
+target_link_libraries(libsorer_test sorer gtest_main)
 
 # link data
 add_custom_target(libsorer_test_link

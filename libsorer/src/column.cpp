@@ -1,7 +1,27 @@
-#include "object.h"
-#include "column.h"
+#include "sorer/object.h"
+#include "sorer/column.h"
 
 namespace ne {
+
+/**
+ * Converts the given ColumnType to a string.
+ * @param type the column type
+ * @return A string representing this column type. Do not free or modify this string.
+ */
+const char* columnTypeToString(ColumnType type) {
+    switch (type) {
+        case ColumnType::STRING:
+            return "STRING";
+        case ColumnType::INTEGER:
+            return "INTEGER";
+        case ColumnType::FLOAT:
+            return "FLOAT";
+        case ColumnType::BOOL:
+            return "BOOL";
+        default:
+            return "UNKNOWN";
+    }
+}
 
 /**
  * Constructs a BaseColumn type.
@@ -274,6 +294,28 @@ ColumnSet::~ColumnSet() {
  * @return The number of columns
  */
 size_t ColumnSet::getLength() { return _length; }
+
+
+
+/**
+ * Creates the right subclass of BaseColumn based on the given type.
+ * @param type The type of column to create
+ * @return The newly created column. Caller must free.
+ */
+BaseColumn* makeColumnFromType(ColumnType type) {
+    switch (type) {
+        case ColumnType::STRING:
+            return new StringColumn();
+        case ColumnType::INTEGER:
+            return new IntegerColumn();
+        case ColumnType::FLOAT:
+            return new FloatColumn();
+        case ColumnType::BOOL:
+            return new BoolColumn();
+        default:
+            assert(false);
+    }
+}
 
 /**
  * Initializes the given column to the given type. Can only be called exactly once per index.

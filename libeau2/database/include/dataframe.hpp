@@ -13,7 +13,7 @@
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"
-#include "parser.h" // from 4500ne
+#include "sorer/parser.h" // from 4500ne
 
 /****************************************************************************
  * DataFrame::

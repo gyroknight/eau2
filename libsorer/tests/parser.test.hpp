@@ -6,7 +6,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "parser.h"
+#include "sorer/column.h"
+#include "sorer/parser.h"
 
 char* cwc_strdup(const char* src) {
     char* result = new char[strlen(src) + 1];
