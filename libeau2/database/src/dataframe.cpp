@@ -212,7 +212,7 @@ void DataFrame::fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set) {
 
             for (size_t i = 0; i < col->getLength(); i++) {
                 if (col->isEntryPresent(i))
-                    newCol->push_back(col->getEntry(i));
+                    newCol->push_back(std::string(col->getEntry(i)));
                 else {
                     // TODO(mike) how to handle missing entries?
                     // newCol->push_back()
