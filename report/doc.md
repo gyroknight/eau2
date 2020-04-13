@@ -120,7 +120,7 @@ This directory is a slightly modified version of https://github.ccs.neu.edu/euhl
 
 The modifications allowed their CwC implementation of a SoR parser to be used in our CMake project. The header files were split into .h and .cpp files, and the `cassert`-based tests were converted to use `gtest`. All of their classes were wrapped in a `ne::` namespace to avoid conflicts. Otherwise, it remains the same.
 
-We also added a static `DataFrame::fromColumnSet` method which takes the output of euhlmann's parser (which uses their own Column types) and converts it to our DataFrame.
+We also added a static `DataFrame::fromColumnSet` method which takes the output of euhlmann's parser (which uses their own Column types) and converts it to our DataFrame. This is wasteful, as we ideally would load the SoRer directly into our own Column types.
 
 ## Use Cases
 
