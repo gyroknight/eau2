@@ -13,12 +13,14 @@ find_package(Threads REQUIRED)
 
 add_subdirectory(test_common)
 add_subdirectory(libeau2)
+add_subdirectory(libsorer)
 add_subdirectory(demo)
 
 # PHONY target to run all tests TODO(mike) make this smarter
 add_custom_target(test
     COMMAND ./libeau2/tests/libeau2_test
-    DEPENDS libeau2_test
+    COMMAND ./libsorer/tests/libsorer_test
+    DEPENDS libeau2_test libsorer_test
 )
 
 # PHONY target to run valgrind
