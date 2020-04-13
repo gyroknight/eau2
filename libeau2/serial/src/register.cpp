@@ -1,3 +1,11 @@
+/**
+ * @file register.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "register.hpp"
 
 Register::Register(in_addr_t address, in_port_t port)

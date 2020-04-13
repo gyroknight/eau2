@@ -1,3 +1,11 @@
+/**
+ * @file directory.hpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #pragma once
 
 #include <netinet/in.h>

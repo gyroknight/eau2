@@ -1,3 +1,11 @@
+/**
+ * @file waitandget.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "waitandget.hpp"
 
 WaitAndGet::WaitAndGet(uint64_t sender, uint64_t target, const Key& key,

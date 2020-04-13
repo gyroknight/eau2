@@ -1,3 +1,11 @@
+/**
+ * @file put.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "put.hpp"
 
 Put::Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,

@@ -1,3 +1,11 @@
+/**
+ * @file registrar.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "registrar.hpp"
 
 #include <unistd.h>

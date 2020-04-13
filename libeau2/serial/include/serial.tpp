@@ -1,3 +1,11 @@
+/**
+ * @file serial.tpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #pragma once
 
 class DataFrame;

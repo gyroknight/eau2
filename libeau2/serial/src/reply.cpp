@@ -1,4 +1,11 @@
-// lang::Cpp
+/**
+ * @file reply.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "reply.hpp"
 
 Reply::Reply(size_t sender, size_t target, size_t id)

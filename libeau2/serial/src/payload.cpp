@@ -1,4 +1,11 @@
-// lang::Cpp
+/**
+ * @file reply.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "payload.hpp"
 
 #include <cstring>

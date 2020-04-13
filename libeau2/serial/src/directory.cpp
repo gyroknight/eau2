@@ -1,3 +1,11 @@
+/**
+ * @file directory.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "directory.hpp"
 
 Directory::Directory(uint64_t sender, uint64_t target, uint64_t idx)

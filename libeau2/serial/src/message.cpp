@@ -1,4 +1,11 @@
-// lang::Cpp
+/**
+ * @file message.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "message.hpp"
 
 #include "ack.hpp"
