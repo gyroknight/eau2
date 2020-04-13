@@ -1,3 +1,5 @@
+#pragma once
+
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -8,7 +10,7 @@
 class Registrar {
    private:
     int _sockfd;
-    std::vector<struct in_addr> _directory;
+    std::vector<struct sockaddr_in> _directory;
     std::shared_mutex _dirMutex;
 
    public:
@@ -16,5 +18,5 @@ class Registrar {
     ~Registrar();
 
     void start();
-    size_t addNode(in_addr_t address);
+    size_t addNode(in_addr_t address, in_port_t port);
 };

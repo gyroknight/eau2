@@ -9,7 +9,7 @@ std::unique_ptr<std::vector<uint8_t>> WaitAndGet::serialize() {
     Serializer ss;
 
     setupCmdHdr(ss);
-    ss.add(_maxDelay).add(key()).add(colIdx()).add(rowIdx());
+    ss.add(colIdx()).add(rowIdx()).add(_maxDelay).add(key());
 
     return ss.generate();
 }

@@ -22,7 +22,7 @@ std::unique_ptr<std::vector<uint8_t>> Get::serialize() {
     Serializer ss;
 
     setupCmdHdr(ss);
-    ss.add(_key).add(_colIdx).add(_rowIdx);
+    ss.add(_colIdx).add(_rowIdx).add(_key);
 
     return ss.generate();
 }

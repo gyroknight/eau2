@@ -12,6 +12,7 @@
 namespace {
 constexpr size_t WAIT_GET_TIMEOUT_S =
     60;  // How long to wait for network responses before failing in seconds
+constexpr const char* PORT = "4500";
 }  // namespace
 
 // Constructs a KVStore using the communication layer provided
@@ -87,10 +88,10 @@ void KVStore::push(const Key& key, std::shared_ptr<DataFrame> value) {
 }
 
 void KVStore::_listen() {
-    _idx = _kvNet.registerNode();
+    _idx = _kvNet.registerNode(PORT);
     bool listening = true;
     while (listening) {
-        std::shared_ptr<Message> msg = _kvNet.receive(_idx);
+        std::shared_ptr<Message> msg = _kvNet.receive();
 
         // Temp
         std::shared_ptr<Put> putMsg;

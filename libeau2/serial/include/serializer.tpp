@@ -4,7 +4,7 @@
 
 template <typename T>
 inline Serializer& Serializer::add(T value) {
-    addBytes(&value, sizeof(T));
+    if (Serial::canSerialize(value)) addBytes(&value, sizeof(T));
     return *this;
 }
 
@@ -15,13 +15,29 @@ inline Serializer& Serializer::add(const char* value) {
 }
 
 template <>
-inline Serializer& Serializer::add(std::string& value) {
+inline Serializer& Serializer::add(const std::string& value) {
     return add(value.c_str());
 }
 
+template <>
+inline Serializer& Serializer::add(const Key& value) {
+    Payload payload(value);
+    payload.serialize(*this);
+    return *this;
+}
+
 template <typename T>
-inline Serializer& Serializer::add(std::shared_ptr<T> ptr) {
-    return add(*ptr);
+inline Serializer& Serializer::add(std::shared_ptr<Column<T>> col) {
+    Payload payload(col);
+    payload.serialize(*this);
+    return *this;
+}
+
+template <>
+inline Serializer& Serializer::add(std::shared_ptr<DataFrame> df) {
+    Payload payload(df);
+    payload.serialize(*this);
+    return *this;
 }
 
 template <typename T>

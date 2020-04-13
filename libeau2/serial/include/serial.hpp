@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "column.hpp"
+
 namespace Serial {
 constexpr size_t CMD_HDR_SIZE = 25;
 constexpr size_t PAYLOAD_HDR_SIZE = 9;
@@ -93,4 +95,13 @@ inline uint8_t typeToValue(Type type) {
             return UINT8_MAX;
     }
 }
+
+template <typename T>
+inline bool canSerialize(T value);
+
+template <typename T>
+inline bool canSerialize(Column<T> value);
+
 }  // namespace Serial
+
+#include "serial.tpp"

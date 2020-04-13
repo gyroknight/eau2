@@ -20,11 +20,17 @@ class Serializer {
 
     template <typename T>
     Serializer& add(T value);
+
     template <typename T>
-    Serializer& add(std::shared_ptr<T> ptr);
+    Serializer& add(std::shared_ptr<Column<T>> col);
+
+    Serializer& add(std::shared_ptr<DataFrame> df);
+
     template <typename T>
     Serializer& add(std::vector<T> vector);
+
     Serializer& addBytes(void* bytes, size_t size);
+
     std::unique_ptr<std::vector<uint8_t>> generate();
 };
 

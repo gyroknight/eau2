@@ -21,14 +21,3 @@ class Demo : public Application {
 
     void summarizer();
 };
-
-class DemoNet : public KVNet {
-   public:
-    std::vector<std::queue<std::shared_ptr<Message>>> nodeMsgs;
-    std::mutex netMutexes[3];
-
-    DemoNet();
-    size_t registerNode() override;
-    void send(std::shared_ptr<Message> msg) override;
-    std::shared_ptr<Message> receive(size_t idx) override;
-};

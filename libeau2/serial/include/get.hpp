@@ -8,12 +8,11 @@
 // Get data from another KV store, ranging from entire DataFrames to single
 // values
 class Get : public Message {
-   private:
+   protected:
     Key _key;
     uint64_t _colIdx;
     uint64_t _rowIdx;
 
-   protected:
     Get(MsgKind kind, uint64_t sender, uint64_t target, const Key& key,
         uint64_t colIdx = UINT64_MAX, uint64_t rowIdx = UINT64_MAX);
 
