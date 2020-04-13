@@ -18,9 +18,21 @@ add_subdirectory(demo)
 
 # PHONY target to run all tests TODO(mike) make this smarter
 add_custom_target(test
-    COMMAND ./libeau2/tests/libeau2_test
-    COMMAND ./libsorer/tests/libsorer_test
-    DEPENDS libeau2_test libsorer_test
+    DEPENDS test1 test2
+)
+
+# test1
+add_custom_target(test1
+    COMMAND "$<TARGET_FILE:libeau2_test>"
+    DEPENDS libeau2_test
+    WORKING_DIRECTORY "$<TARGET_FILE_DIR:libeau2_test>"
+)
+
+# test2
+add_custom_target(test2
+    COMMAND "$<TARGET_FILE:libsorer_test>"
+    DEPENDS libsorer_test
+    WORKING_DIRECTORY "$<TARGET_FILE_DIR:libsorer_test>"
 )
 
 # PHONY target to run valgrind

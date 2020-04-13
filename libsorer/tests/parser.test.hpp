@@ -106,3 +106,57 @@ TEST(ParserTest, strSlice) {
     StrSlice slice5{"+437896", 0, 5};
     ASSERT_EQ(4378, slice5.toInt());
 }
+
+class FileTest : public ::testing::Test {
+   protected:
+    FILE* file;
+    size_t fsize;
+
+    FileTest() : file(NULL), fsize(0) {}
+    ~FileTest() {
+        if (file) fclose(file);
+    }
+
+    void LoadFile(const char* filename) {
+        if (file) fclose(file);
+
+        file = fopen(filename, "r");
+
+        ASSERT_FALSE(file == NULL);
+
+        fseek(file, 0, SEEK_END);
+        fsize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+    }
+};
+
+TEST_F(FileTest, dataTest) {
+    LoadFile("data.sor");
+    
+    SorParser parser(file, 0, fsize, fsize);
+
+    parser.guessSchema();
+    parser.parseFile();
+
+    ColumnSet* set = parser.getColumnSet();
+
+    ASSERT_EQ(ColumnType::BOOL, set->getColumn(0)->getType());
+    ASSERT_EQ(ColumnType::INTEGER, set->getColumn(1)->getType());
+    ASSERT_EQ(ColumnType::STRING, set->getColumn(2)->getType());
+
+    BoolColumn* boolcol = dynamic_cast<BoolColumn*>(set->getColumn(0));
+    IntegerColumn* intcol = dynamic_cast<IntegerColumn*>(set->getColumn(1));
+    StringColumn* strcol = dynamic_cast<StringColumn*>(set->getColumn(2));
+
+    ASSERT_EQ(false, boolcol->getEntry(0));
+    ASSERT_EQ(true, boolcol->getEntry(1));
+    ASSERT_EQ(true, boolcol->getEntry(2));
+
+    ASSERT_EQ(23, intcol->getEntry(0));
+    ASSERT_EQ(12, intcol->getEntry(1));
+    ASSERT_EQ(1, intcol->getEntry(2));
+
+    ASSERT_STREQ("hi", strcol->getEntry(0));
+    ASSERT_FALSE(strcol->isEntryPresent(1));
+    ASSERT_FALSE(strcol->isEntryPresent(2));
+}
