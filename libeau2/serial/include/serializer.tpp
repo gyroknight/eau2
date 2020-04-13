@@ -33,13 +33,6 @@ inline Serializer& Serializer::add(std::shared_ptr<Column<T>> col) {
     return *this;
 }
 
-template <>
-inline Serializer& Serializer::add(std::shared_ptr<DataFrame> df) {
-    Payload payload(df);
-    payload.serialize(*this);
-    return *this;
-}
-
 template <typename T>
 inline Serializer& Serializer::add(std::vector<T> vector) {
     for (T& item : vector) add(item);
