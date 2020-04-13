@@ -1,3 +1,10 @@
+/**
+ * @file parser.cpp
+ * @author euhlmann (uhlmann.e@husky.neu.edu)
+ * 
+ * Used with permission and modifications by Michael Hebert (mike.s.hebert@gmail.com) and Vincent Zhao (zhao.v@northeastern.edu)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
