@@ -1,3 +1,11 @@
+/**
+ * @file dataframe.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "dataframe.hpp"
 
 #include "sorer/column.h"  // from 4500ne

@@ -1,4 +1,10 @@
-// lang::Cpp
+/**
+ * @file row.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
 
 #include "row.hpp"
 

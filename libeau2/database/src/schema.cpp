@@ -1,3 +1,11 @@
+/**
+ * @file schena.cpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #include "schema.hpp"
 
 Schema::Schema(const Schema& from)
