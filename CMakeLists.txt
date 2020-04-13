@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2.2)
+cmake_minimum_required(VERSION 3.13.0)
 
 project(eau2 VERSION 0.01
              DESCRIPTION "Distributed key-value store"
@@ -13,6 +13,7 @@ find_package(Threads REQUIRED)
 
 add_subdirectory(test_common)
 add_subdirectory(libeau2)
+add_subdirectory(libsorer)
 add_subdirectory(demo)
 
 # PHONY target to run all tests TODO(mike) make this smarter

@@ -7,6 +7,7 @@ add_library(eau2 "")
 add_subdirectory(database)
 add_subdirectory(network)
 add_subdirectory(serial)
+add_subdirectory(sorer)
 add_subdirectory(tests)
 
 target_link_libraries(eau2 Threads::Threads)
