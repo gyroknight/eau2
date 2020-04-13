@@ -1,5 +1,7 @@
 #include "dataframe.hpp"
 
+#include "sorer/column.h"  // from 4500ne
+
 DataFrame::DataFrame() : DataFrame(Schema()) {}
 
 /** Create a data frame with the same columns as the given df but with no
@@ -185,4 +187,89 @@ void DataFrame::pmap(Rower& r) {
             rowers[ii - 1] = nullptr;
         }
     }
+}
+
+/**
+ * @brief Creates a database from 4500ne's parsers. There's some data overhead
+ * that would be solved by refactoring our code or theirs to share the same
+ * column types.
+ *
+ * @param key   the key in the store
+ * @param kv    the store
+ * @param set   the set of columns
+ */
+void DataFrame::fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set) {
+    auto df = std::make_shared<DataFrame>();
+
+    for (size_t i = 0; i < set->getLength(); i++) {
+        ne::BaseColumn* basecol = set->getColumn(i);
+
+        // TODO(mike) this loop is porrly written
+        if (basecol->getType() == ne::ColumnType::STRING) {
+            auto newCol = std::make_shared<Column<std::string>>();
+
+            ne::StringColumn* col = dynamic_cast<ne::StringColumn*>(basecol);
+
+            for (size_t i = 0; i < col->getLength(); i++) {
+                if (col->isEntryPresent(i))
+                    newCol->push_back(std::string(col->getEntry(i)));
+                else {
+                    // TODO(mike) how to handle missing entries?
+                    // newCol->push_back()
+                }
+            }
+
+            df->addCol(newCol);
+
+        } else if (basecol->getType() == ne::ColumnType::INTEGER) {
+            auto newCol = std::make_shared<Column<int>>();
+
+            ne::IntegerColumn* col = dynamic_cast<ne::IntegerColumn*>(basecol);
+
+            for (size_t i = 0; i < col->getLength(); i++) {
+                if (col->isEntryPresent(i))
+                    newCol->push_back(col->getEntry(i));
+                else {
+                    // newCol->push_back()
+                }
+            }
+
+            df->addCol(newCol);
+
+        } else if (basecol->getType() == ne::ColumnType::FLOAT) {
+            auto newCol = std::make_shared<Column<float>>();
+
+            ne::FloatColumn* col = dynamic_cast<ne::FloatColumn*>(basecol);
+
+            for (size_t i = 0; i < col->getLength(); i++) {
+                if (col->isEntryPresent(i))
+                    newCol->push_back(col->getEntry(i));
+                else {
+                    // newCol->push_back()
+                }
+            }
+
+            df->addCol(newCol);
+
+        } else if (basecol->getType() == ne::ColumnType::BOOL) {
+            auto newCol = std::make_shared<Column<bool>>();
+
+            ne::BoolColumn* col = dynamic_cast<ne::BoolColumn*>(basecol);
+
+            for (size_t i = 0; i < col->getLength(); i++) {
+                if (col->isEntryPresent(i))
+                    newCol->push_back(col->getEntry(i));
+                else {
+                    // newCol->push_back()
+                }
+            }
+
+            df->addCol(newCol);
+
+        } else {  // unknown type TODO(mike) handle this
+            assert(false);
+        }
+    }
+
+    kv->push(*key, df);
 }
