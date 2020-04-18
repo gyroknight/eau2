@@ -2,7 +2,7 @@
  * @file serializer.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 
-#include "payload.hpp"
 #include "serial.hpp"
 
 // Builds a serial bytestream of items
@@ -29,9 +28,9 @@ class Serializer {
     Serializer& add(T value);
 
     template <typename T>
-    Serializer& add(std::shared_ptr<Column<T>> col);
+    Serializer& add(ColPtr<T> col);
 
-    Serializer& add(std::shared_ptr<DataFrame> df);
+    Serializer& add(DFPtr df);
 
     template <typename T>
     Serializer& add(std::vector<T> vector);

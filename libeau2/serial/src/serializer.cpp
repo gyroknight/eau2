@@ -2,16 +2,44 @@
  * @file serializer.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "serializer.hpp"
 
+#include "key.hpp"
+#include "payload.hpp"
+
 Serializer::Serializer() {}
 
-Serializer& Serializer::add(std::shared_ptr<DataFrame> df) {
+Serializer& Serializer::add(DFPtr df) {
     Payload payload(df);
+    payload.serialize(*this);
+    return *this;
+}
+
+template <>
+Serializer& Serializer::add(const char* value) {
+    addBytes(const_cast<char*>(value), strlen(value) + 1);
+    return *this;
+}
+
+template <>
+Serializer& Serializer::add(const std::string& value) {
+    return add(value.c_str());
+}
+
+template <>
+Serializer& Serializer::add(const Key& value) {
+    Payload payload(value);
+    payload.serialize(*this);
+    return *this;
+}
+
+template <>
+Serializer& Serializer::add(ColIPtr value) {
+    Payload payload(value);
     payload.serialize(*this);
     return *this;
 }

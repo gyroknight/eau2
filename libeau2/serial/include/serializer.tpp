@@ -2,7 +2,7 @@
  * @file serializer.tpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -16,29 +16,9 @@ inline Serializer& Serializer::add(T value) {
     return *this;
 }
 
-template <>
-inline Serializer& Serializer::add(const char* value) {
-    addBytes(const_cast<char*>(value), strlen(value) + 1);
-    return *this;
-}
-
-template <>
-inline Serializer& Serializer::add(const std::string& value) {
-    return add(value.c_str());
-}
-
-template <>
-inline Serializer& Serializer::add(const Key& value) {
-    Payload payload(value);
-    payload.serialize(*this);
-    return *this;
-}
-
 template <typename T>
-inline Serializer& Serializer::add(std::shared_ptr<Column<T>> col) {
-    Payload payload(col);
-    payload.serialize(*this);
-    return *this;
+inline Serializer& Serializer::add(ColPtr<T> col) {
+    return add(std::dynamic_pointer_cast<ColumnInterface>(col));
 }
 
 template <typename T>
