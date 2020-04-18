@@ -8,9 +8,18 @@
 
 #include "payload.hpp"
 
+#include <cstdint>
 #include <cstring>
+#include <iostream>
+#include <iterator>
+#include <stdexcept>
+#include <string>
 
+#include "column.hpp"
 #include "dataframe.hpp"
+#include "key.hpp"
+#include "serial.hpp"
+#include "serializer.hpp"
 
 /**
  * @brief Construct a new Payload:: Payload object from a bytestream

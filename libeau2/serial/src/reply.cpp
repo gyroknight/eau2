@@ -2,11 +2,16 @@
  * @file reply.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "reply.hpp"
+
+#include <cstdio>
+
+#include "payload.hpp"
+#include "serializer.hpp"
 
 Reply::Reply(size_t sender, size_t target, size_t id)
     : Message(MsgKind::Reply, sender, target, id) {}

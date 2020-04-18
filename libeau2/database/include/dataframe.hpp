@@ -8,19 +8,21 @@
  */
 #pragma once
 
-#include <string>
-#include <thread>
-#include <variant>
+#include <cstddef>
+#include <memory>
 #include <vector>
 
-#include "column.hpp"
 #include "commondefs.hpp"
-#include "key.hpp"
-#include "kvstore.hpp"
-#include "row.hpp"
-#include "rower.hpp"
 #include "schema.hpp"
-#include "sorer/parser.h"  // from 4500ne
+
+class ColumnInterface;
+class KVStore;
+class Key;
+class Row;
+class Rower;
+namespace ne {
+class ColumnSet;
+}
 
 /****************************************************************************
  * DataFrame::

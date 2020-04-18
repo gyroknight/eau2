@@ -2,16 +2,19 @@
  * @file reply.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 #pragma once
 
-#include "column.hpp"
-#include "dataframe.hpp"
-#include "key.hpp"
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 #include "message.hpp"
-#include "payload.hpp"
+
+class Payload;
 
 // Data requested by another node
 class Reply : public Message {

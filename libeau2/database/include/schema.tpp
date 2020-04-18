@@ -2,11 +2,13 @@
  * @file schena.tpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
+
+#include <iostream>
 
 template <typename T>
 inline bool Schema::addCol(const Column<T>& col, ExtString name) {

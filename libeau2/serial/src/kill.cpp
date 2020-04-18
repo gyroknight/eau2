@@ -2,11 +2,13 @@
  * @file kill.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "kill.hpp"
+
+#include "serializer.hpp"
 
 Kill::Kill(uint64_t sender, uint64_t target)
     : Message(MsgKind::Kill, sender, target, Message::getNextID()) {}

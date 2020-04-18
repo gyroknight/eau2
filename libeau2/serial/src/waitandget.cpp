@@ -2,11 +2,15 @@
  * @file waitandget.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "waitandget.hpp"
+
+#include "key.hpp"
+#include "message.hpp"
+#include "serializer.hpp"
 
 WaitAndGet::WaitAndGet(uint64_t sender, uint64_t target, const Key& key,
                        uint32_t maxDelay, uint64_t colIdx, uint64_t rowIdx)

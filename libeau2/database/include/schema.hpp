@@ -2,18 +2,20 @@
  * @file schema.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
 
-#include <iostream>
+#include <cstddef>
 #include <string>
 #include <vector>
 
-#include "column.hpp"
 #include "commondefs.hpp"
+
+template <typename T>
+class Column;
 
 /*************************************************************************
  * Schema::

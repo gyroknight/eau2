@@ -2,11 +2,15 @@
  * @file register.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "register.hpp"
+
+#include <sys/socket.h>
+
+#include "serializer.hpp"
 
 Register::Register(in_addr_t address, in_port_t port)
     : Message(MsgKind::Register, 0, 0, Register::getNextID()) {

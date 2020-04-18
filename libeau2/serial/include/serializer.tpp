@@ -10,6 +10,8 @@
 
 #include <cstring>
 
+#include "serial.hpp"
+
 template <typename T>
 inline Serializer& Serializer::add(T value) {
     if (Serial::canSerialize(value)) addBytes(&value, sizeof(T));

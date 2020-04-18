@@ -7,7 +7,9 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <string>
+#include <string_view>
 
 // Key for a DataFrame on a KV store, ties the DF to a name and a node
 class Key {

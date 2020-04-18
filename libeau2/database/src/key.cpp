@@ -2,11 +2,13 @@
  * @file key.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "key.hpp"
+
+#include <functional>
 
 Key::Key(std::string& name, size_t home) : _name(name), _home(home) {}
 Key::Key(const char* name, size_t home) : _name(name), _home(home) {}

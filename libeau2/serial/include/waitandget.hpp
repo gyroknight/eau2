@@ -2,13 +2,19 @@
  * @file waitandget.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 #include "get.hpp"
+
+class Key;
 
 class WaitAndGet : public Get {
    private:

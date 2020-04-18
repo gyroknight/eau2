@@ -8,13 +8,13 @@
 
 #pragma once
 
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "commondefs.hpp"
 #include "serial.hpp"
 
-class DataFrame;
-class Key;
 class Serializer;
 
 // Serialized data to include with messages

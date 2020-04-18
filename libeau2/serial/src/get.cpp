@@ -2,11 +2,13 @@
  * @file get.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "get.hpp"
+
+#include "serializer.hpp"
 
 Get::Get(MsgKind kind, uint64_t sender, uint64_t target, const Key& key,
          uint64_t colIdx, uint64_t rowIdx)

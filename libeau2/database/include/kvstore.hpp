@@ -9,21 +9,23 @@
 #pragma once
 
 #include <condition_variable>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
-#include <unordered_set>
 
+#include "commondefs.hpp"
 #include "key.hpp"
-#include "kvnet.hpp"
 
 // Forward declarations
-class DataFrame;
 class Get;
 class Reply;
 class WaitAndGet;
+class KVNet;
+class Message;
 
 // Alias for map of DataFrames
 using DFMap = std::unordered_map<Key, DFPtr>;

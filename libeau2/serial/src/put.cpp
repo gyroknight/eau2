@@ -8,6 +8,9 @@
 
 #include "put.hpp"
 
+#include "key.hpp"
+#include "serializer.hpp"
+
 Put::Put(uint64_t sender, const Key& key, DFPtr value, uint64_t colIdx,
          uint64_t rowIdx)
     : Message(MsgKind::Put, sender, key.home(), Message::getNextID()),

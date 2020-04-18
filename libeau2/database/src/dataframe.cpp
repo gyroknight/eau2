@@ -2,12 +2,25 @@
  * @file dataframe.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "dataframe.hpp"
 
+#include <cassert>
+#include <cstdio>
+#include <stdexcept>
+#include <string>
+#include <thread>
+
+#include "chunk.hpp"
+#include "column.hpp"
+#include "kvstore.hpp"
+#include "payload.hpp"
+#include "row.hpp"
+#include "rower.hpp"
+#include "schema.hpp"
 #include "sorer/column.h"  // from 4500ne
 
 DataFrame::DataFrame() : DataFrame(Schema()) {}

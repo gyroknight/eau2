@@ -2,11 +2,13 @@
  * @file nack.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "nack.hpp"
+
+#include "serializer.hpp"
 
 Nack::Nack(uint64_t sender, uint64_t target, uint64_t id)
     : Message(MsgKind::Nack, sender, target, id) {}

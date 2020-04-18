@@ -11,6 +11,12 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads REQUIRED)
 
+# Tool for checking for redundant includes
+find_program(iwyu_path NAMES include-what-you-use iwyu)
+if((NOT iwyu_path) AND (DEFINED CHECK_INCLUDES))
+  message(FATAL_ERROR "Could not find the program include-what-you-use")
+endif()
+
 add_subdirectory(test_common)
 add_subdirectory(libeau2)
 add_subdirectory(libsorer)

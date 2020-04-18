@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
-#include "serial.hpp"
+#include "commondefs.hpp"
 
 // Builds a serial bytestream of items
 class Serializer {

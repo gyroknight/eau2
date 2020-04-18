@@ -2,20 +2,29 @@
  * @file kvnetTcp.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
 
+#include <netinet/in.h>
+#include <sys/types.h>
+
 #include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <shared_mutex>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "kvnet.hpp"
+
+class Message;
 
 class KVNetTCP : public KVNet {
    private:

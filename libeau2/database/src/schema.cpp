@@ -2,11 +2,14 @@
  * @file schena.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "schema.hpp"
+
+#include <iostream>
+#include <memory>
 
 Schema::Schema(const Schema& from)
     : _rowNames(from._rowNames),

@@ -2,11 +2,16 @@
  * @file row.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "row.hpp"
+
+#include <iostream>
+
+#include "fielder.hpp"
+#include "schema.hpp"
 
 Row::Row(Schema& scm) : _schema(scm), _idx(0), _data(scm.width()) {}
 

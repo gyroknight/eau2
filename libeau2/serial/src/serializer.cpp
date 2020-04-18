@@ -8,6 +8,10 @@
 
 #include "serializer.hpp"
 
+#include <cstring>
+#include <string>
+#include <utility>
+
 #include "key.hpp"
 #include "payload.hpp"
 

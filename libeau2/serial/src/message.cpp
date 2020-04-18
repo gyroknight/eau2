@@ -2,21 +2,18 @@
  * @file message.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "message.hpp"
 
+#include <stdexcept>
+
 #include "ack.hpp"
-#include "directory.hpp"
-#include "get.hpp"
-#include "kill.hpp"
 #include "nack.hpp"
-#include "put.hpp"
-#include "register.hpp"
-#include "reply.hpp"
-#include "waitandget.hpp"
+#include "serial.hpp"
+#include "serializer.hpp"
 
 Message::Message(MsgKind kind, size_t sender, size_t target, size_t id)
     : _kind(kind), _sender(sender), _target(target), _id(id) {}

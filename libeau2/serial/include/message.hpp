@@ -2,23 +2,23 @@
  * @file message.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
 
 #include <atomic>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
-#include "serial.hpp"
-#include "serializer.hpp"
+class Serializer;
 
 /**
  * @brief Type of message
- * 
+ *
  */
 enum class MsgKind {
     Ack,
@@ -48,7 +48,7 @@ class Message {
    protected:
     /**
      * @brief Construct a new Message object
-     * 
+     *
      * @param kind what type of message
      * @param sender node index of the source
      * @param target node index of the receiver
@@ -59,7 +59,7 @@ class Message {
    public:
     /**
      * @brief Destroy the Message object
-     * 
+     *
      */
     virtual ~Message();
 
@@ -71,28 +71,28 @@ class Message {
 
     /**
      * @brief Get the next (sequential) ID
-     * 
+     *
      * @return size_t the next ID
      */
     static size_t getNextID();
 
     /**
      * @brief Serialize the message into a byte vector
-     * 
+     *
      * @return std::unique_ptr<std::vector<uint8_t>> pointer to the byte vector
      */
     virtual std::unique_ptr<std::vector<uint8_t>> serialize() = 0;
 
     /**
      * @brief Builds the header for the command
-     * 
+     *
      * @param s serializer to use
      */
     virtual void setupCmdHdr(Serializer& s) final;
 
     /**
      * @brief Convert the type of message to a byte value for serialization
-     * 
+     *
      * @param kind the message type
      * @return uint8_t the byte representation
      */
@@ -100,7 +100,7 @@ class Message {
 
     /**
      * @brief Convert byte value to MsgKind for deserialization
-     * 
+     *
      * @param value the byte value
      * @return MsgKind the message type
      */
@@ -108,7 +108,7 @@ class Message {
 
     /**
      * @brief Convert a byte vector to a message
-     * 
+     *
      * @param bytestream the stream of bytes
      * @return std::unique_ptr<Message> the deserialized message
      */

@@ -8,6 +8,9 @@
 
 #include <exception>
 
+#include "column.hpp"
+#include "kvstore.hpp"
+
 /** Adds a column this dataframe, updates the schema, the new column
  * is external, and appears as the last column of the dataframe, the
  * name is optional and external. A nullptr colum is undefined. */

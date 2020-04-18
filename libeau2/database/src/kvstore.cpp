@@ -8,13 +8,21 @@
 
 #include "kvstore.hpp"
 
+#include <chrono>
+#include <cstdint>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include "get.hpp"
 #include "key.hpp"
 #include "kill.hpp"
+#include "kvnet.hpp"
+#include "message.hpp"
+#include "payload.hpp"
 #include "put.hpp"
 #include "reply.hpp"
+#include "serial.hpp"
 #include "waitandget.hpp"
 
 namespace {

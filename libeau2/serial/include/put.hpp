@@ -8,9 +8,14 @@
 
 #pragma once
 
-#include "dataframe.hpp"
-#include "key.hpp"
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+#include "commondefs.hpp"
 #include "message.hpp"
+
+class Key;
 
 // Puts data from one node to another, ranging from entire DFs to single items
 class Put : public Message {

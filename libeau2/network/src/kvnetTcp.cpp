@@ -10,14 +10,19 @@
 
 #include <netdb.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <iostream>
+#include <iterator>
 #include <stack>
+#include <stdexcept>
+#include <utility>
 
 #include "directory.hpp"
+#include "message.hpp"
 #include "register.hpp"
+#include "serial.hpp"
 #include "tcpUtils.hpp"
 
 namespace {

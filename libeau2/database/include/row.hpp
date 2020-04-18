@@ -2,17 +2,20 @@
  * @file row.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #pragma once
 
+#include <cstddef>
 #include <variant>
+#include <vector>
 
 #include "commondefs.hpp"
-#include "fielder.hpp"
-#include "schema.hpp"
+
+class Fielder;
+class Schema;
 
 /*************************************************************************
  * Row::

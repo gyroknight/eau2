@@ -15,3 +15,7 @@ target_include_directories(eau2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../libsorer/
 target_compile_options(eau2
     PUBLIC -Wall
 )
+
+if(DEFINED CHECK_INCLUDES)
+    set_property(TARGET eau2 PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+endif()
