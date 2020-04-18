@@ -13,6 +13,8 @@
 
 #include "chunk.hpp"
 
+class Serializer;
+
 /**
  * @brief A common interface representing a Column, allows for different Column
  * types to be stored within the same STL containers.
@@ -26,6 +28,10 @@ class ColumnInterface {
 
     /** Returns the column as a string "1, 2, 3, 4" */
     virtual std::string str() const = 0;
+
+    virtual void serialize(Serializer& ss) const = 0;
+
+    virtual bool canSerialize() const = 0;
 };
 
 /**
@@ -64,10 +70,14 @@ class Column : public ColumnInterface {
     void push_back(T val);
 
     /** Returns the number of elements in the column. */
-    virtual size_t size() const override;
+    size_t size() const override;
 
     /** Returns the column as a string "1, 2, 3, 4" */
-    virtual std::string str() const override;
+    std::string str() const override;
+
+    void serialize(Serializer& ss) const override;
+
+    bool canSerialize() const override;
 };
 
 #include "column.tpp"

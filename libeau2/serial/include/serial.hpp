@@ -2,7 +2,7 @@
  * @file serial.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -10,8 +10,7 @@
 
 #include <cstdint>
 
-#include "column.hpp"
-
+#include "commondefs.hpp"
 namespace Serial {
 constexpr size_t CMD_HDR_SIZE = 25;
 constexpr size_t PAYLOAD_HDR_SIZE = 9;
@@ -108,8 +107,13 @@ template <typename T>
 inline bool canSerialize(T value);
 
 template <typename T>
-inline bool canSerialize(Column<T> value);
+inline bool canSerializeAsCol(T value);
 
+template <typename T>
+inline Type isType(T item);
+
+template <typename T>
+inline Type isColType(ColPtr<T> col);
 }  // namespace Serial
 
 #include "serial.tpp"

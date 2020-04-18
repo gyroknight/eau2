@@ -10,10 +10,12 @@
 #include <cstddef>
 #include <sstream>
 
+#include "payload.hpp"
+
 namespace {}  // namespace
 
 // construct a column
-template <class T>
+template <typename T>
 Column<T>::Column() : _size(0) {}
 
 // Creates a column with the provided elements
@@ -79,4 +81,16 @@ std::string Column<T>::str() const {
     }
 
     return ss.str();
+}
+
+template <typename T>
+void Column<T>::serialize(Serializer& ss) const {
+    Payload colData;
+    for (size_t ii = 0; ii < size(); ii++) colData.add(get(ii));
+    colData.serialize(ss);
+}
+
+template <typename T>
+bool Column<T>::canSerialize() const {
+    return size() != 0 && Serial::canSerializeAsCol(get(0));
 }
