@@ -2,7 +2,7 @@
  * @file kvnetTcp.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -27,13 +27,20 @@ constexpr const char* PORT = "4500";
 
 KVNetTCP::KVNetTCP() {}
 KVNetTCP::~KVNetTCP() {
+    // Net is down
     _netUp = false;
+
+    // Wait for sender and receiver to stop
     if (_sender.joinable()) _sender.join();
     if (_receiver.joinable()) _receiver.join();
 }
 
+// Registers node with the registrar and awaits directory before starting sender
+// and receiver
 size_t KVNetTCP::registerNode(const char* port) {
+    // Can't register more than once
     if (_idx) throw std::runtime_error("Node is already registered");
+
     ssize_t ret;
     struct addrinfo* registrarInfo = TCP::generateAddrinfo(PORT, REGISTRAR);
 
@@ -42,6 +49,7 @@ size_t KVNetTCP::registerNode(const char* port) {
     _sockfds[0] = TCP::createSocket(registrarInfo);
     _sockfdsLock.unlock();
 
+    // we want a predetermined connection port
     TCP::bindToPort(_sockfds[0], port);
 
     if (connect(_sockfds[0], registrarInfo->ai_addr,
@@ -68,6 +76,8 @@ size_t KVNetTCP::registerNode(const char* port) {
     if (!dirMsg) {
         throw std::runtime_error("Invalid Directory from registrar");
     }
+
+    // Set node index and populate directory
     _idx = dirMsg->idx();
     _dir.insert(std::end(_dir), std::begin(dirMsg->dir()),
                 std::end(dirMsg->dir()));
@@ -76,11 +86,13 @@ size_t KVNetTCP::registerNode(const char* port) {
 }
 
 // Might want to play around with serialization here instead of in event handler
+// Adds a Message to be sent
 void KVNetTCP::send(std::shared_ptr<Message> msg) {
     const std::lock_guard<std::mutex> lock(_sendLock);
     _sending.push(msg);
 }
 
+// Removes a Message that has been received for processing
 std::unique_ptr<Message> KVNetTCP::receive() {
     const std::lock_guard<std::mutex> lock(_receiveLock);
     if (!_receiving.empty()) {
@@ -92,16 +104,19 @@ std::unique_ptr<Message> KVNetTCP::receive() {
     return nullptr;
 }
 
+// Reads in Message bytestream from node and deserializes
 std::unique_ptr<Message> KVNetTCP::_readMsg(uint64_t idx) {
     std::shared_lock<std::shared_mutex> lock(_sockfdsLock);
     if (!_sockfds.count(idx)) return nullptr;
     auto msg = std::make_unique<std::vector<uint8_t>>();
 
+    // Read Command Header
     if (TCP::recvData(_sockfds[idx], *msg, Serial::CMD_HDR_SIZE)) {
         std::cerr << "Failed to get command header\n";
         return nullptr;
     }
 
+    // Read Message-specific data
     switch (Message::valueToMsgKind((*msg)[0])) {
         case MsgKind::Ack:
         case MsgKind::Nack:
@@ -129,10 +144,13 @@ std::unique_ptr<Message> KVNetTCP::_readMsg(uint64_t idx) {
     return Message::deserialize(std::move(msg));
 }
 
+// Reads bytestream for a Payload
 ssize_t KVNetTCP::_readPayload(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
-    std::stack<uint64_t> pending;
+    std::stack<uint64_t> pending;  // Keeps track of pending Payloads for
+                                   // multi-Payload transmissions
 
+    // Get first Payload
     if ((ret = TCP::recvData(_sockfds[idx], msg, 17))) {
         std::cerr << "Failed to get Payload header\n";
         return ret;
@@ -148,6 +166,7 @@ ssize_t KVNetTCP::_readPayload(uint64_t idx, std::vector<uint8_t>& msg) {
         return ret;
     }
 
+    // Get next Payloads if applicable
     while (payloadsLeft) {
         if ((ret = TCP::recvData(_sockfds[idx], msg, 17))) {
             std::cerr << "Failed to get Payload header\n";
@@ -178,6 +197,7 @@ ssize_t KVNetTCP::_readPayload(uint64_t idx, std::vector<uint8_t>& msg) {
     return 0;
 }
 
+// Reads bytestream for Put
 ssize_t KVNetTCP::_readPut(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
 
@@ -200,6 +220,7 @@ ssize_t KVNetTCP::_readPut(uint64_t idx, std::vector<uint8_t>& msg) {
     return 0;
 }
 
+// Reads bytestream for Reply
 ssize_t KVNetTCP::_readReply(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
 
@@ -211,6 +232,7 @@ ssize_t KVNetTCP::_readReply(uint64_t idx, std::vector<uint8_t>& msg) {
     return 0;
 }
 
+// Reads bytestream for Get
 ssize_t KVNetTCP::_readGet(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
 
@@ -228,6 +250,7 @@ ssize_t KVNetTCP::_readGet(uint64_t idx, std::vector<uint8_t>& msg) {
     return 0;
 }
 
+// Reads bytestream for WaitAndGet
 ssize_t KVNetTCP::_readWaitAndGet(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
 
@@ -245,6 +268,7 @@ ssize_t KVNetTCP::_readWaitAndGet(uint64_t idx, std::vector<uint8_t>& msg) {
     return 0;
 }
 
+// Reads bytestream for Directory
 ssize_t KVNetTCP::_readDirectory(uint64_t idx, std::vector<uint8_t>& msg) {
     ssize_t ret;
 

@@ -44,6 +44,7 @@ void Registrar::start() {
     }
 }
 
+// Adds a node to the directory
 size_t Registrar::addNode(in_addr_t address, in_port_t port) {
     const std::lock_guard<std::shared_mutex> lock(_dirMutex);
     struct sockaddr_in node;

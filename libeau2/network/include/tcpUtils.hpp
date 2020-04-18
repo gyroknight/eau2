@@ -2,7 +2,7 @@
  * @file tcpUtils.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -17,8 +17,10 @@
 #include <exception>
 #include <iostream>
 
+// Utility functions for interacting with sockets interface over TCP
 namespace TCP {
 
+// Creates an addrinfo context based on a port and/or an address/hostname
 inline struct addrinfo* generateAddrinfo(const char* port,
                                          const char* address = nullptr) {
     int rv;
@@ -37,6 +39,7 @@ inline struct addrinfo* generateAddrinfo(const char* port,
     return info;
 }
 
+// Creates a socket based an addrinfo context, or port and/or address/hostname
 inline int createSocket(struct addrinfo* info, const char* port,
                         const char* address) {
     int sockfd;
@@ -51,6 +54,7 @@ inline int createSocket(struct addrinfo* info, const char* port,
     return sockfd;
 }
 
+// Convenience socket creators
 inline int createSocket(struct addrinfo* info) {
     return createSocket(info, nullptr, nullptr);
 }
@@ -63,6 +67,7 @@ inline int createSocket(const char* port, const char* address) {
     return createSocket(nullptr, port, address);
 }
 
+// Bind the socket provided to the port
 inline void bindToPort(int sockfd, const char* port) {
     struct addrinfo* connInfo = generateAddrinfo(port);
     int enableReuseAddr = 1;
@@ -80,6 +85,7 @@ inline void bindToPort(int sockfd, const char* port) {
     freeaddrinfo(connInfo);
 }
 
+// Send an entire packet of data
 inline ssize_t sendPacket(int socket,
                           std::unique_ptr<std::vector<uint8_t>> packet,
                           int flags = 0) {
@@ -106,6 +112,7 @@ inline ssize_t sendPacket(int socket,
     return sent == -1 ? -errno : 0;
 }
 
+// Receive an entire block of data
 inline ssize_t recvData(int socket, void* buf, size_t bytes) {
     ssize_t totalRecvd = 0;
     ssize_t bytesLeft = bytes;
