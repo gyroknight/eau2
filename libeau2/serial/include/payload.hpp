@@ -2,7 +2,7 @@
  * @file payload.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -10,7 +10,6 @@
 
 #include <vector>
 
-#include "column.hpp"
 #include "commondefs.hpp"
 #include "serial.hpp"
 
@@ -22,41 +21,31 @@ class Serializer;
 class Payload {
    private:
     Serial::Type _type = Serial::Type::Unknown;
-    uint64_t _payloadsLeft = 0;
     std::vector<uint8_t> _data;
     std::shared_ptr<void> _ref = nullptr;
 
-    friend class Serializer;
+    void _setupThisPayload(Serializer& ss, uint64_t remaining);
+    void _serializeColumn(Serializer& ss);
+    void _serializeDataFrame(Serializer& ss);
 
-    template <typename T>
-    void _addColType(const Column<T>& col);
+    friend class Serializer;
 
    public:
     Payload(std::vector<uint8_t>::iterator start,
             std::vector<uint8_t>::iterator end);
 
-    Payload(double val);
-
-    Payload(std::string& str);
+    Payload();
 
     template <typename T>
-    Payload(std::shared_ptr<Column<T>> col);
+    Payload(T value);
 
-    Payload(const Key& key);
+    Serial::Type type() const;
 
-    Payload(std::shared_ptr<DataFrame> df);
+    template <typename T>
+    bool add(T value);
 
-    size_t size() const;
-
-    Serial::Type type();
-
-    uint64_t asU64();
-
-    double asDouble();
-
-    ExtString asString();
-
-    std::shared_ptr<DataFrame> asDataFrame();
+    template <typename T>
+    bool add(ColPtr<T> value);
 
     void serialize(Serializer& ss);
 };
