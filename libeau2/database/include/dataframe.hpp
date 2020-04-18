@@ -45,7 +45,7 @@ class DataFrame {
     friend class Payload;
 
     template <typename T>
-    static void fillColumn(std::shared_ptr<Column<T>> col, T* arr, size_t size);
+    static void fillColumn(ColPtr<T> col, T* arr, size_t size);
 
    public:
     // Creates an empty DataFrame
@@ -79,7 +79,7 @@ class DataFrame {
      * is external, and appears as the last column of the dataframe, the
      * name is optional and external. A nullptr colum is undefined. */
     template <typename T>
-    void addCol(std::shared_ptr<Column<T>> col, ExtString name = nullptr);
+    void addCol(ColPtr<T> col, ExtString name = nullptr);
 
     /** Return the value at the given column and row. Accessing rows or
      *  columns out of bounds, or request the wrong type is undefined.*/

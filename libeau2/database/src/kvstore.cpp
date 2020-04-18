@@ -2,7 +2,7 @@
  * @file kvstore.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -37,7 +37,7 @@ KVStore::~KVStore() {
 
 // Adds a DataFrame to the store at the key provided, assuming it does not
 // already exist
-void KVStore::insert(const Key& key, std::shared_ptr<DataFrame> value) {
+void KVStore::insert(const Key& key, DFPtr value) {
     std::shared_lock<std::shared_mutex> readLock(_storeMutex);
     // Currently ignores
     if (_store.count(key)) {
@@ -52,7 +52,7 @@ void KVStore::insert(const Key& key, std::shared_ptr<DataFrame> value) {
     _cv.notify_all();
 }
 
-std::shared_ptr<DataFrame> KVStore::waitAndGet(const Key& key) {
+DFPtr KVStore::waitAndGet(const Key& key) {
     std::shared_lock<std::shared_mutex> lock(_storeMutex);
 
     if (_store.count(key)) {
@@ -87,7 +87,7 @@ void KVStore::fetch(const Key& key, bool wait) {
     }
 }
 
-void KVStore::push(const Key& key, std::shared_ptr<DataFrame> value) {
+void KVStore::push(const Key& key, DFPtr value) {
     if (key.home() == _idx) {
         insert(key, value);
     } else {
@@ -153,7 +153,7 @@ void KVStore::_postReply(std::shared_ptr<Reply> reply) {
             case MsgKind::WaitAndGet:
                 getMsg = std::dynamic_pointer_cast<Get>(msg);
                 if (reply->payload()->type() == Serial::Type::DataFrame) {
-                    insert(getMsg->key(), reply->payload()->asDataFrame());
+                    // insert(getMsg->key(), reply->payload()->asDataFrame());
                 } else {
                     // Not sure what we'll use Get for that aren't dataframes
                 }
@@ -169,7 +169,7 @@ void KVStore::_postReply(std::shared_ptr<Reply> reply) {
 void KVStore::_sendGetReply(std::shared_ptr<Get> msg) {
     const std::shared_lock<std::shared_mutex> lock(_storeMutex);
     if (_store.count(msg->key())) {
-        std::shared_ptr<DataFrame> df = _store[msg->key()];
+        DFPtr df = _store[msg->key()];
         if (msg->colIdx() == UINT64_MAX && msg->rowIdx() == UINT64_MAX) {
             auto reply =
                 std::make_shared<Reply>(_idx, msg->sender(), msg->id());
@@ -183,7 +183,7 @@ void KVStore::_sendGetReply(std::shared_ptr<Get> msg) {
 
 void KVStore::_startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg) {
     auto asyncResponse = [this, msg]() {
-        std::shared_ptr<DataFrame> df = waitAndGet(msg->key());
+        DFPtr df = waitAndGet(msg->key());
         _sendGetReply(msg);
     };
 

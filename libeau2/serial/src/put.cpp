@@ -2,14 +2,14 @@
  * @file put.cpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include "put.hpp"
 
-Put::Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,
-         uint64_t colIdx, uint64_t rowIdx)
+Put::Put(uint64_t sender, const Key& key, DFPtr value, uint64_t colIdx,
+         uint64_t rowIdx)
     : Message(MsgKind::Put, sender, key.home(), Message::getNextID()),
       _key(key),
       _value(value),
@@ -17,7 +17,7 @@ Put::Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,
       _rowIdx(rowIdx) {}
 
 const Key& Put::key() { return _key; }
-std::shared_ptr<DataFrame> Put::value() { return _value; }
+DFPtr Put::value() { return _value; }
 
 /**
  * @brief Put is represented as the following serial format:

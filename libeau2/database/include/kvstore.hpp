@@ -2,7 +2,7 @@
  * @file kvstore.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -26,7 +26,7 @@ class Reply;
 class WaitAndGet;
 
 // Alias for map of DataFrames
-using DFMap = std::unordered_map<Key, std::shared_ptr<DataFrame>>;
+using DFMap = std::unordered_map<Key, DFPtr>;
 
 // A mix of local and remote DataFrames keyed by name and node location.
 class KVStore {
@@ -71,16 +71,16 @@ class KVStore {
 
     // Adds a DataFrame to the store at the key provided, assuming it does not
     // already exist
-    void insert(const Key& key, std::shared_ptr<DataFrame> value);
+    void insert(const Key& key, DFPtr value);
 
     // Waits for the DataFrame at the given key to become available locally,
     // otherwise nullptr
-    std::shared_ptr<DataFrame> waitAndGet(const Key& key);
+    DFPtr waitAndGet(const Key& key);
 
     // Fetches a remote DataFrame by posting either a Get or WaitAndGet message
     // to the network
     void fetch(const Key& key, bool wait);
 
     // Pushes a DataFrame to a remote KVStore
-    void push(const Key& key, std::shared_ptr<DataFrame> value);
+    void push(const Key& key, DFPtr value);
 };

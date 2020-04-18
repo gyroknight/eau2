@@ -12,7 +12,7 @@
  * is external, and appears as the last column of the dataframe, the
  * name is optional and external. A nullptr colum is undefined. */
 template <typename T>
-inline void DataFrame::addCol(std::shared_ptr<Column<T>> col, ExtString name) {
+inline void DataFrame::addCol(ColPtr<T> col, ExtString name) {
     if (_schema.addCol(*col, name))
         _data.push_back(col);
     else

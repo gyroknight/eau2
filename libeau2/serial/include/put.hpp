@@ -2,7 +2,7 @@
  * @file put.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -16,16 +16,16 @@
 class Put : public Message {
    private:
     const Key& _key;
-    std::shared_ptr<DataFrame> _value;
+    DFPtr _value;
     uint64_t _colIdx;
     uint64_t _rowIdx;
 
    public:
-    Put(uint64_t sender, const Key& key, std::shared_ptr<DataFrame> value,
+    Put(uint64_t sender, const Key& key, DFPtr value,
         uint64_t colIdx = UINT64_MAX, uint64_t rowIdx = UINT64_MAX);
 
     const Key& key();
-    std::shared_ptr<DataFrame> value();
+    DFPtr value();
 
     std::unique_ptr<std::vector<uint8_t>> serialize() override;
 };
