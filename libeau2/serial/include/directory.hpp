@@ -21,6 +21,12 @@ class Directory : public Message {
     uint64_t _idx;
     std::vector<struct sockaddr_in> _dir;
 
+    static std::unique_ptr<Message> deserializeAs(BStreamIter start,
+                                                  BStreamIter end);
+
+    friend std::unique_ptr<Message> Message::deserialize(
+        std::unique_ptr<std::vector<uint8_t>>);
+
    public:
     Directory(uint64_t sender, uint64_t target, uint64_t idx);
 

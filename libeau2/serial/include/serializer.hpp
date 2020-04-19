@@ -30,8 +30,6 @@ class Serializer {
     template <typename T>
     Serializer& add(ColPtr<T> col);
 
-    Serializer& add(DFPtr df);
-
     template <typename T>
     Serializer& add(std::vector<T> vector);
 

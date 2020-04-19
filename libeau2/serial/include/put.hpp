@@ -25,6 +25,12 @@ class Put : public Message {
     uint64_t _colIdx;
     uint64_t _rowIdx;
 
+    static std::unique_ptr<Message> deserializeAs(BStreamIter start,
+                                                  BStreamIter end);
+
+    friend std::unique_ptr<Message> Message::deserialize(
+        std::unique_ptr<std::vector<uint8_t>>);
+
    public:
     Put(uint64_t sender, const Key& key, DFPtr value,
         uint64_t colIdx = UINT64_MAX, uint64_t rowIdx = UINT64_MAX);

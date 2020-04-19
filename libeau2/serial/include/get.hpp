@@ -18,6 +18,13 @@
 // Get data from another KV store, ranging from entire DataFrames to single
 // values
 class Get : public Message {
+   private:
+    static std::unique_ptr<Message> deserializeAs(BStreamIter start,
+                                                  BStreamIter end);
+
+    friend std::unique_ptr<Message> Message::deserialize(
+        std::unique_ptr<std::vector<uint8_t>>);
+
    protected:
     Key _key;
     uint64_t _colIdx;

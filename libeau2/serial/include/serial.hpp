@@ -107,7 +107,7 @@ template <typename T>
 inline bool canSerialize(T value);
 
 template <typename T>
-inline bool canSerializeAsCol(T value);
+inline bool canSerializeTrivially(T value);
 
 template <typename T>
 inline Type isType(T item);

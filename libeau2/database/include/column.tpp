@@ -92,5 +92,5 @@ void Column<T>::serialize(Serializer& ss) const {
 
 template <typename T>
 bool Column<T>::canSerialize() const {
-    return size() != 0 && Serial::canSerializeAsCol(get(0));
+    return size() != 0 && Serial::canSerializeTrivially(get(0));
 }

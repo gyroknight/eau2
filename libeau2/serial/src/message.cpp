@@ -11,9 +11,16 @@
 #include <stdexcept>
 
 #include "ack.hpp"
+#include "directory.hpp"
+#include "get.hpp"
+#include "kill.hpp"
 #include "nack.hpp"
+#include "put.hpp"
+#include "register.hpp"
+#include "reply.hpp"
 #include "serial.hpp"
 #include "serializer.hpp"
+#include "waitandget.hpp"
 
 Message::Message(MsgKind kind, size_t sender, size_t target, size_t id)
     : _kind(kind), _sender(sender), _target(target), _id(id) {}
@@ -100,7 +107,7 @@ std::unique_ptr<Message> Message::deserialize(
     std::unique_ptr<std::vector<uint8_t>> bytestream) {
     if (bytestream->size() < Serial::CMD_HDR_SIZE)
         throw std::invalid_argument("Message is too small");
-    std::vector<uint8_t>::iterator bytes = bytestream->begin();
+    BStreamIter bytes = bytestream->begin();
     MsgKind kind = valueToMsgKind(*bytes++);
     uint64_t sender = *reinterpret_cast<uint64_t*>(&(*bytes));
     bytes += sizeof(uint64_t);
@@ -109,26 +116,42 @@ std::unique_ptr<Message> Message::deserialize(
     uint64_t id = *reinterpret_cast<uint64_t*>(&(*bytes));
     bytes += sizeof(uint64_t);
 
+    BStreamIter bytesEnd = bytestream->end();
+
+    std::unique_ptr<Message> msg;
+
     switch (kind) {
         case MsgKind::Ack:
             return std::make_unique<Ack>(sender, target, id);
         case MsgKind::Nack:
             return std::make_unique<Nack>(sender, target, id);
         case MsgKind::Put:
-            return nullptr;
+            msg = Put::deserializeAs(bytes, bytesEnd);
         case MsgKind::Reply:
-            return nullptr;
+            msg = Reply::deserializeAs(bytes, bytesEnd);
         case MsgKind::Get:
-            return nullptr;
+            msg = Get::deserializeAs(bytes, bytesEnd);
         case MsgKind::WaitAndGet:
-            return nullptr;
+            msg = WaitAndGet::deserializeAs(bytes, bytesEnd);
         case MsgKind::Kill:
-            return nullptr;
+            return std::make_unique<Kill>(sender, target);
         case MsgKind::Register:
-            return nullptr;
+            msg = Register::deserializeAs(bytes, bytesEnd);
         case MsgKind::Directory:
-            return nullptr;
+            msg = Directory::deserializeAs(bytes, bytesEnd);
         default:
+            std::cerr << "Unknown Message type\n";
             return nullptr;
     }
+
+    if (!msg) {
+        std::cerr << "Failed to deserialize Message\n";
+        return nullptr;
+    }
+
+    msg->_sender = sender;
+    msg->_target = target;
+    msg->_id = id;
+
+    return msg;
 }

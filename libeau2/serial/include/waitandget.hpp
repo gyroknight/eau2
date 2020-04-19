@@ -20,6 +20,12 @@ class WaitAndGet : public Get {
    private:
     uint32_t _maxDelay;
 
+    static std::unique_ptr<Message> deserializeAs(BStreamIter start,
+                                                  BStreamIter end);
+
+    friend std::unique_ptr<Message> Message::deserialize(
+        std::unique_ptr<std::vector<uint8_t>>);
+
    public:
     WaitAndGet(uint64_t sender, uint64_t target, const Key& key,
                uint32_t maxDelay = 5000, uint64_t colIdx = UINT64_MAX,

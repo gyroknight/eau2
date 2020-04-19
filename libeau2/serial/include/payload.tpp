@@ -47,5 +47,57 @@ inline bool Payload::add(T value) {
 
 template <typename T>
 inline bool Payload::add(ColPtr<T> value) {
-    return add(std::dynamic_pointer_cast<ColumnInterface>(value));
+    if (_type != Serial::Type::Unknown) {
+        std::cerr << "Payload is already set\n";
+        return false;
+    }
+
+    if (!Serial::canSerialize(value)) {
+        std::cerr << "Unsupported Column type\n";
+        return false;
+    }
+
+    _type = Serial::Type::Column;
+    _colType = Serial::isColType(value);
+    _ref = value;
+
+    return true;
 }
+
+template <>
+inline bool Payload::add(const Key& value);
+
+template <typename T>
+inline ColPtr<T> Payload::asColumn() {
+    if (_type != Serial::Type::Column) {
+        std::cerr << "Payload is not a Column\n";
+        return nullptr;
+    }
+
+    auto col = std::static_pointer_cast<ColumnInterface>(_ref);
+
+    return std::dynamic_pointer_cast<Column<T>>(col);
+}
+
+template <typename T>
+inline void Payload::_unpackAsCol(Payload& colData) {
+    auto col = std::make_shared<Column<T>>();
+
+    if (colData._data.size() % sizeof(T) != 0) {
+        std::cerr << "Column data size mismatch\n";
+        return;
+    }
+
+    size_t numItems = colData._data.size() / sizeof(T);
+
+    T* item = reinterpret_cast<T*>(colData._data.data());
+
+    for (size_t ii = 0; ii < numItems; ii++) {
+        col->push_back(*item++);
+    }
+
+    _ref = col;
+}
+
+template <>
+inline void Payload::_unpackAsCol<ExtString>(Payload& colData);

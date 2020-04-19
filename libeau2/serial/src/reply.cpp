@@ -38,3 +38,20 @@ std::unique_ptr<std::vector<uint8_t>> Reply::serialize() {
 
     return ss.generate();
 }
+
+std::unique_ptr<Message> Reply::deserializeAs(BStreamIter start,
+                                              BStreamIter end) {
+    auto payload = std::make_shared<Payload>();
+    payload->deserialize(start, end);
+
+    if (payload->type() == Serial::Type::Unknown) {
+        std::cerr << "Cannot read Reply payload\n";
+        return nullptr;
+    }
+
+    auto reply = std::make_unique<Reply>(0, 0, 0);
+
+    reply->_payload = payload;
+
+    return reply;
+}

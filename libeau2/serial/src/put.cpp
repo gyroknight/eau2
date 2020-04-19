@@ -42,3 +42,35 @@ std::unique_ptr<std::vector<uint8_t>> Put::serialize() {
 
     return ss.generate();
 }
+
+std::unique_ptr<Message> Put::deserializeAs(BStreamIter start,
+                                            BStreamIter end) {
+    if (std::distance(start, end) < sizeof(uint64_t)) {
+        std::cerr << "Put data is too small\n";
+        return nullptr;
+    }
+
+    uint64_t colIdx = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+    uint64_t rowIdx = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+
+    Payload key;
+    start = key.deserialize(start, end);
+
+    if (key.type() != Serial::Type::Key) {
+        std::cerr << "Unexpected Put Key\n";
+        return nullptr;
+    }
+
+    Payload df;
+    start = df.deserialize(start, end);
+
+    if (df.type() != Serial::Type::DataFrame) {
+        std::cerr << "Unexpected Put value\n";
+        return nullptr;
+    }
+
+    return std::make_unique<Put>(0, key.asKey(), df.asDataFrame(), colIdx,
+                                 rowIdx);
+}

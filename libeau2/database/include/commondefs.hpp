@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 // Common type definitions
 
@@ -26,3 +27,5 @@ template <typename T>
 using ColPtr = std::shared_ptr<Column<T>>;
 
 using ColIPtr = std::shared_ptr<ColumnInterface>;
+
+using BStreamIter = std::vector<uint8_t>::iterator;

@@ -55,3 +55,34 @@ std::unique_ptr<std::vector<uint8_t>> Directory::serialize() {
 
     return ss.generate();
 }
+
+std::unique_ptr<Message> Directory::deserializeAs(BStreamIter start,
+                                                  BStreamIter end) {
+    if (std::distance(start, end) < 2 * sizeof(uint64_t)) {
+        std::cerr << "Directory data too small\n";
+        return nullptr;
+    }
+
+    uint64_t idx = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+    uint64_t nodes = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+
+    if (std::distance(start, end) !=
+        nodes * (sizeof(uint32_t) + sizeof(uint16_t))) {
+        std::cerr << "Unexpected Directory size\n";
+        return nullptr;
+    }
+
+    auto dirMsg = std::make_unique<Directory>(0, 0, idx);
+
+    for (size_t ii = 0; ii < nodes; ii++) {
+        in_addr_t address = *reinterpret_cast<uint32_t*>(&(*start));
+        start += sizeof(uint32_t);
+        in_port_t port = *reinterpret_cast<uint16_t*>(&(*start));
+        start += sizeof(uint16_t);
+        dirMsg->addNode(address, port);
+    }
+
+    return dirMsg;
+}

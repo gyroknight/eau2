@@ -36,3 +36,17 @@ std::unique_ptr<std::vector<uint8_t>> Register::serialize() {
 
     return ss.generate();
 }
+
+std::unique_ptr<Message> Register::deserializeAs(BStreamIter start,
+                                                 BStreamIter end) {
+    if (std::distance(start, end) < sizeof(uint32_t) + sizeof(uint16_t)) {
+        std::cerr << "Register data is too small\n";
+        return nullptr;
+    }
+
+    in_addr_t address = *reinterpret_cast<uint32_t*>(&(*start));
+    start += sizeof(uint32_t);
+    in_port_t port = *reinterpret_cast<uint16_t*>(&(*start));
+
+    return std::make_unique<Register>(address, port);
+}

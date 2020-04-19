@@ -17,12 +17,6 @@
 
 Serializer::Serializer() {}
 
-Serializer& Serializer::add(DFPtr df) {
-    Payload payload(df);
-    payload.serialize(*this);
-    return *this;
-}
-
 template <>
 Serializer& Serializer::add(const char* value) {
     addBytes(const_cast<char*>(value), strlen(value) + 1);
@@ -32,20 +26,6 @@ Serializer& Serializer::add(const char* value) {
 template <>
 Serializer& Serializer::add(const std::string& value) {
     return add(value.c_str());
-}
-
-template <>
-Serializer& Serializer::add(const Key& value) {
-    Payload payload(value);
-    payload.serialize(*this);
-    return *this;
-}
-
-template <>
-Serializer& Serializer::add(ColIPtr value) {
-    Payload payload(value);
-    payload.serialize(*this);
-    return *this;
 }
 
 /**

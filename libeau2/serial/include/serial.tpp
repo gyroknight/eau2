@@ -20,12 +20,12 @@ inline bool canSerialize(T value) {
 template <typename U>
 inline bool canSerialize(Column<U> value) {
     if (value.size() == 0) return false;
-    return canSerializeAsCol(value.get(0));
+    return canSerializeTrivially(value.get(0));
 }
 
 template <typename T>
-inline bool canSerializeAsCol(T value) {
-    Type valType = isType(value);
+inline bool canSerializeTrivially(T value) {
+    Serial::Type valType = isType(value);
     switch (valType) {
         case Type::U8:
         case Type::I8:
@@ -133,7 +133,7 @@ template <typename T>
 inline Type isColType(ColPtr<T> col) {
     Type colType = Type::Unknown;
     if (col->size() > 0) colType = isType(col->get(0));
-    return canSerializeAsCol(col->get(0)) ? colType : Type::Unknown;
+    return canSerializeTrivially(col->get(0)) ? colType : Type::Unknown;
 }
 
 }  // namespace Serial

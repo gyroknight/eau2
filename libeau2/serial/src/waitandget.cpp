@@ -36,3 +36,29 @@ std::unique_ptr<std::vector<uint8_t>> WaitAndGet::serialize() {
 
     return ss.generate();
 }
+
+std::unique_ptr<Message> WaitAndGet::deserializeAs(BStreamIter start,
+                                                   BStreamIter end) {
+    if (std::distance(start, end) < 2 * sizeof(uint64_t) + sizeof(uint32_t)) {
+        std::cerr << "WaitAndGet data is too small\n";
+        return nullptr;
+    }
+
+    uint64_t colIdx = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+    uint64_t rowIdx = *reinterpret_cast<uint64_t*>(&(*start));
+    start += sizeof(uint64_t);
+    uint32_t maxDelay = *reinterpret_cast<uint32_t*>(&(*start));
+    start += sizeof(uint32_t);
+
+    Payload key;
+    start = key.deserialize(start, end);
+
+    if (key.type() != Serial::Type::Key) {
+        std::cerr << "Unexpected WaitAndGet Key\n";
+        return nullptr;
+    }
+
+    return std::make_unique<WaitAndGet>(0, 0, key.asKey(), maxDelay, colIdx,
+                                        rowIdx);
+}
