@@ -45,6 +45,9 @@ inline bool Payload::add(T value) {
     return true;
 }
 
+template <>
+bool Payload::add<ExtString>(ExtString value);
+
 template <typename T>
 inline bool Payload::add(ColPtr<T> value) {
     if (_type != Serial::Type::Unknown) {
@@ -65,7 +68,7 @@ inline bool Payload::add(ColPtr<T> value) {
 }
 
 template <>
-inline bool Payload::add(const Key& value);
+bool Payload::add<Key>(Key value);
 
 template <typename T>
 inline ColPtr<T> Payload::asColumn() {
@@ -80,7 +83,7 @@ inline ColPtr<T> Payload::asColumn() {
 }
 
 template <typename T>
-inline void Payload::_unpackAsCol(Payload& colData) {
+inline void Payload::_unpackAsCol(Payload& colData, uint64_t& payloadsLeft) {
     auto col = std::make_shared<Column<T>>();
 
     if (colData._data.size() % sizeof(T) != 0) {
@@ -97,7 +100,10 @@ inline void Payload::_unpackAsCol(Payload& colData) {
     }
 
     _ref = col;
+
+    payloadsLeft--;
 }
 
 template <>
-inline void Payload::_unpackAsCol<ExtString>(Payload& colData);
+inline void Payload::_unpackAsCol<ExtString>(Payload& colData,
+                                             uint64_t& payloadsLeft);

@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "commondefs.hpp"
+#include "serial.hpp"
 
 template <typename T>
 class Column;
@@ -61,20 +62,22 @@ class Schema {
 
     /** Return name of row at idx; nullptr indicates no name. An idx >=
      * width is undefined. */
-    std::string row_name(size_t idx) const;
+    std::string rowName(size_t idx) const;
 
     /** Return name of column at idx; nullptr indicates no name given.
      *  An idx >= width is undefined.*/
-    std::string col_name(size_t idx) const;
+    std::string colName(size_t idx) const;
 
     /** Return type of column at idx. An idx >= width is undefined. */
-    char col_type(size_t idx) const;
+    char colType(size_t idx) const;
+
+    Serial::Type colSerialType(size_t idx) const;
 
     /** Given a column name return its index, or -1. */
-    int col_idx(const char* name) const;
+    int colIdx(const char* name) const;
 
     /** Given a row name return its index, or -1. */
-    int row_idx(const char* name) const;
+    int rowIdx(const char* name) const;
 
     /** The number of columns */
     size_t width() const;

@@ -33,7 +33,7 @@ class Payload {
     BStreamIter _deserializeDataFrame(uint64_t& payloadsLeft, BStreamIter start,
                                       BStreamIter end);
     template <typename T>
-    void _unpackAsCol(Payload& colData);
+    void _unpackAsCol(Payload& colData, uint64_t& payloadsLeft);
 
     friend class Serializer;
 

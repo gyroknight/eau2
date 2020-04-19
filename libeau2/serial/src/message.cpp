@@ -127,18 +127,24 @@ std::unique_ptr<Message> Message::deserialize(
             return std::make_unique<Nack>(sender, target, id);
         case MsgKind::Put:
             msg = Put::deserializeAs(bytes, bytesEnd);
+            break;
         case MsgKind::Reply:
             msg = Reply::deserializeAs(bytes, bytesEnd);
+            break;
         case MsgKind::Get:
             msg = Get::deserializeAs(bytes, bytesEnd);
+            break;
         case MsgKind::WaitAndGet:
             msg = WaitAndGet::deserializeAs(bytes, bytesEnd);
+            break;
         case MsgKind::Kill:
             return std::make_unique<Kill>(sender, target);
         case MsgKind::Register:
             msg = Register::deserializeAs(bytes, bytesEnd);
+            break;
         case MsgKind::Directory:
             msg = Directory::deserializeAs(bytes, bytesEnd);
+            break;
         default:
             std::cerr << "Unknown Message type\n";
             return nullptr;

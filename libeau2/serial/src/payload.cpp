@@ -26,7 +26,26 @@ Payload::Payload() {}
 Serial::Type Payload::type() const { return _type; }
 
 template <>
-bool Payload::add(const Key& value) {
+bool Payload::add(ExtString value) {
+    if (_type != Serial::Type::Unknown && Serial::isType(value) != _type) {
+        std::cerr << "Payload is already set\n";
+        return false;
+    }
+
+    if (_type == Serial::Type::Unknown) _type = Serial::isType(value);
+
+    for (const char& cc : *value) {
+        _data.push_back(static_cast<uint8_t>(cc));
+    }
+
+    // Need null terminator
+    _data.push_back(static_cast<uint8_t>('\0'));
+
+    return true;
+}
+
+template <>
+bool Payload::add(Key value) {
     if (_type != Serial::Type::Unknown) {
         std::cerr << "Payload is already set\n";
         return false;
@@ -39,7 +58,7 @@ bool Payload::add(const Key& value) {
     uint64_t home = value.home();
     memcpy(_data.data(), &home, sizeof(uint64_t));
     memcpy(_data.data() + sizeof(uint64_t), value.name().c_str(),
-           value.name().size());
+           value.name().size() + 1);
     _data.shrink_to_fit();
 
     return true;
@@ -84,7 +103,7 @@ BStreamIter Payload::deserialize(BStreamIter start, BStreamIter end) {
     start += sizeof(uint64_t);
 
     // Get this Payload's data
-    if (std::distance(start, end) != dataSize)
+    if (std::distance(start, end) < dataSize)
         throw std::invalid_argument("Invalid Payload data");
     _data = std::vector<uint8_t>(start, start + dataSize);
     start += dataSize;
@@ -153,8 +172,59 @@ void Payload::_serializeDataFrame(Serializer& ss) {
     DFPtr df = std::static_pointer_cast<DataFrame>(_ref);
     if (!df) throw std::runtime_error("Invalid DataFrame reference");
     _setupThisPayload(ss, df->ncols());
+
+    Schema& dfSchema = df->getSchema();
+
     for (size_t ii = 0; ii < df->ncols(); ii++) {
-        Payload col(df->_data[ii]);
+        Payload col;
+        switch (dfSchema.colSerialType(ii)) {
+            case Serial::Type::U8:
+                col.add(
+                    std::dynamic_pointer_cast<Column<uint8_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::I8:
+                col.add(
+                    std::dynamic_pointer_cast<Column<int8_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::U16:
+                col.add(
+                    std::dynamic_pointer_cast<Column<uint16_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::I16:
+                col.add(
+                    std::dynamic_pointer_cast<Column<int16_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::U32:
+                col.add(
+                    std::dynamic_pointer_cast<Column<uint32_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::I32:
+                col.add(
+                    std::dynamic_pointer_cast<Column<int32_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::U64:
+                col.add(
+                    std::dynamic_pointer_cast<Column<uint64_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::I64:
+                col.add(
+                    std::dynamic_pointer_cast<Column<int64_t>>(df->_data[ii]));
+                break;
+            case Serial::Type::Float:
+                col.add(
+                    std::dynamic_pointer_cast<Column<float>>(df->_data[ii]));
+                break;
+            case Serial::Type::Double:
+                col.add(
+                    std::dynamic_pointer_cast<Column<double>>(df->_data[ii]));
+                break;
+            case Serial::Type::String:
+                col.add(std::dynamic_pointer_cast<Column<ExtString>>(
+                    df->_data[ii]));
+                break;
+            default:
+                std::cerr << "Unsupported Column type\n";
+        }
         col.serialize(ss);
     }
 }
@@ -174,37 +244,37 @@ BStreamIter Payload::_deserializeColumn(uint64_t& payloadsLeft,
 
     switch (_colType) {
         case Serial::Type::U8:
-            _unpackAsCol<uint8_t>(colData);
+            _unpackAsCol<uint8_t>(colData, payloadsLeft);
             break;
         case Serial::Type::I8:
-            _unpackAsCol<int8_t>(colData);
+            _unpackAsCol<int8_t>(colData, payloadsLeft);
             break;
         case Serial::Type::U16:
-            _unpackAsCol<uint16_t>(colData);
+            _unpackAsCol<uint16_t>(colData, payloadsLeft);
             break;
         case Serial::Type::I16:
-            _unpackAsCol<int16_t>(colData);
+            _unpackAsCol<int16_t>(colData, payloadsLeft);
             break;
         case Serial::Type::U32:
-            _unpackAsCol<uint32_t>(colData);
+            _unpackAsCol<uint32_t>(colData, payloadsLeft);
             break;
         case Serial::Type::I32:
-            _unpackAsCol<int32_t>(colData);
+            _unpackAsCol<int32_t>(colData, payloadsLeft);
             break;
         case Serial::Type::U64:
-            _unpackAsCol<uint64_t>(colData);
+            _unpackAsCol<uint64_t>(colData, payloadsLeft);
             break;
         case Serial::Type::I64:
-            _unpackAsCol<int64_t>(colData);
+            _unpackAsCol<int64_t>(colData, payloadsLeft);
             break;
         case Serial::Type::Float:
-            _unpackAsCol<float>(colData);
+            _unpackAsCol<float>(colData, payloadsLeft);
             break;
         case Serial::Type::Double:
-            _unpackAsCol<double>(colData);
+            _unpackAsCol<double>(colData, payloadsLeft);
             break;
         case Serial::Type::String:
-            _unpackAsCol<ExtString>(colData);
+            _unpackAsCol<ExtString>(colData, payloadsLeft);
             break;
         default:
             std::cerr << "Unsupported Column type\n";
@@ -272,7 +342,8 @@ BStreamIter Payload::_deserializeDataFrame(uint64_t& payloadsLeft,
 }
 
 template <>
-void Payload::_unpackAsCol<ExtString>(Payload& colData) {
+void Payload::_unpackAsCol<ExtString>(Payload& colData,
+                                      uint64_t& payloadsLeft) {
     auto col = std::make_shared<Column<ExtString>>();
 
     auto string = std::make_shared<std::string>();
@@ -290,4 +361,6 @@ void Payload::_unpackAsCol<ExtString>(Payload& colData) {
         std::cerr << "Malformed data, last string not null terminated\n";
 
     _ref = col;
+
+    payloadsLeft--;
 }

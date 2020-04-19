@@ -48,17 +48,36 @@ void Schema::addRow(ExtString name) { _rowNames.push_back(name); }
 
 /** Return name of row at idx; nullptr indicates no name. An idx >=
  * width is undefined. */
-std::string Schema::row_name(size_t idx) const { return *_rowNames.at(idx); }
+std::string Schema::rowName(size_t idx) const { return *_rowNames.at(idx); }
 
 /** Return name of column at idx; nullptr indicates no name given.
  *  An idx >= width is undefined.*/
-std::string Schema::col_name(size_t idx) const { return *_colNames.at(idx); }
+std::string Schema::colName(size_t idx) const { return *_colNames.at(idx); }
 
 /** Return type of column at idx. An idx >= width is undefined. */
-char Schema::col_type(size_t idx) const { return _colTypes.at(idx); }
+char Schema::colType(size_t idx) const { return _colTypes.at(idx); }
+
+Serial::Type Schema::colSerialType(size_t idx) const {
+    switch (_colTypes.at(idx)) {
+        case 'S':
+            return Serial::Type::String;
+        case 'B':
+            return Serial::Type::Bool;
+        case 'L':
+            return Serial::Type::I64;
+        case 'I':
+            return Serial::Type::I32;
+        case 'D':
+            return Serial::Type::Double;
+        case 'F':
+            return Serial::Type::Float;
+        default:
+            return Serial::Type::Unknown;
+    }
+}
 
 /** Given a column name return its index, or -1. */
-int Schema::col_idx(const char* name) const {
+int Schema::colIdx(const char* name) const {
     for (size_t ii = 0; ii < _colNames.size(); ii++) {
         if (*_colNames[ii] == name) {
             return ii;
@@ -69,7 +88,7 @@ int Schema::col_idx(const char* name) const {
 }
 
 /** Given a row name return its index, or -1. */
-int Schema::row_idx(const char* name) const {
+int Schema::rowIdx(const char* name) const {
     for (size_t ii = 0; ii < _rowNames.size(); ii++) {
         if (*_rowNames[ii] == name) {
             return ii;

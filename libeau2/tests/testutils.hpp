@@ -2,7 +2,7 @@
  * @file testutils.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -20,12 +20,12 @@ static const char col_types[] = {'I', 'B', 'D', 'S'};
     if (a.length() != b.length()) return false;
 
     for (size_t i = 0; i < a.width(); i++) {
-        if (a.col_name(i) != b.col_name(i)) return false;
-        if (a.col_type(i) != b.col_type(i)) return false;
+        if (a.colName(i) != b.colName(i)) return false;
+        if (a.colType(i) != b.colType(i)) return false;
     }
 
     for (size_t i = 0; i < a.length(); i++) {
-        if (a.row_name(i) != b.row_name(i)) return false;
+        if (a.rowName(i) != b.rowName(i)) return false;
     }
 
     return true;

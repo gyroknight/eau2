@@ -2,7 +2,7 @@
  * @file testutils.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
@@ -66,7 +66,7 @@ TEST_P(SchemaTestString, cons_string) {
     ASSERT_EQ(0, sc.length());
 
     for (size_t i = 0; i < len; i++) {
-        ASSERT_EQ(GetParam()[i], sc.col_type(i));
+        ASSERT_EQ(GetParam()[i], sc.colType(i));
     }
 }
 
@@ -77,7 +77,7 @@ TEST_P(SchemaTestString, cons_copy) {
     ASSERT_EQ(0, cp.length());
 
     for (size_t i = 0; i < len; i++) {
-        ASSERT_EQ(GetParam()[i], cp.col_type(i));
+        ASSERT_EQ(GetParam()[i], cp.colType(i));
     }
 }
 
@@ -101,7 +101,7 @@ TEST_F(SchemaTest, add_col) {
 
     for (int i = 0; i < 10000; i++) {
         ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(),
-                     sc.col_name(i).c_str());
+                     sc.colName(i).c_str());
     }
 }
 
@@ -116,7 +116,7 @@ TEST_F(SchemaTest, addRow) {
 
     for (int i = 0; i < 10000; i++) {
         ASSERT_STREQ(i % 2 ? "" : str("name", i).c_str(),
-                     sc.row_name(i).c_str());
+                     sc.rowName(i).c_str());
     }
 }
 
@@ -130,7 +130,7 @@ TEST_F(SchemaTest, col_idx) {
     }
 
     for (int i = 0; i < 1000; i++) {
-        ASSERT_EQ(i, sc.col_idx(("name" + std::to_string(i)).c_str()));
+        ASSERT_EQ(i, sc.colIdx(("name" + std::to_string(i)).c_str()));
     }
 }
 
@@ -143,7 +143,7 @@ TEST_F(SchemaTest, row_idx) {
     }
 
     for (int i = 0; i < 1000; i++) {
-        ASSERT_EQ(i, sc.row_idx(("name" + std::to_string(i)).c_str()));
+        ASSERT_EQ(i, sc.rowIdx(("name" + std::to_string(i)).c_str()));
     }
 }
 

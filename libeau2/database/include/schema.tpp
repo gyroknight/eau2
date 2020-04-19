@@ -48,7 +48,7 @@ inline char Schema::colToType(const Column<bool>& col) {
 }
 
 template <>
-inline char Schema::colToType(const Column<std::string>& col) {
+inline char Schema::colToType(const Column<ExtString>& col) {
     return 'S';
 }
 

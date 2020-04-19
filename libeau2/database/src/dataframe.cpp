@@ -35,7 +35,7 @@ DataFrame::DataFrame(const Schema& schema) : _schema(schema) {
     _data.reserve(schema.width());
     char type;
     for (size_t ii = 0; ii < schema.width(); ii++) {
-        type = schema.col_type(ii);
+        type = schema.colType(ii);
         switch (type) {
             case 'I':
                 _data.push_back(std::make_shared<Column<int>>());
@@ -47,7 +47,7 @@ DataFrame::DataFrame(const Schema& schema) : _schema(schema) {
                 _data.push_back(std::make_shared<Column<double>>());
                 break;
             case 'S':
-                _data.push_back(std::make_shared<Column<std::string>>());
+                _data.push_back(std::make_shared<Column<ExtString>>());
                 break;
             default:
                 throw std::invalid_argument("Unsupported type");
@@ -87,7 +87,7 @@ void DataFrame::fillRow(size_t idx, Row& row) {
 
     row.setIdx(idx);
     for (size_t ii = 0; ii < _schema.width(); ii++) {
-        switch (_schema.col_type(ii)) {
+        switch (_schema.colType(ii)) {
             case 'I':
                 row.set(ii, getInt(ii, idx));
                 break;
@@ -108,7 +108,7 @@ void DataFrame::fillRow(size_t idx, Row& row) {
  *  the right schema and be filled with values, otherwise undedined.  */
 void DataFrame::add_row(Row& row) {
     for (size_t ii = 0; ii < _schema.width(); ii++) {
-        switch (_schema.col_type(ii)) {
+        switch (_schema.colType(ii)) {
             case 'I':
                 dynamic_cast<Column<int>&>(*_data[ii])
                     .push_back(row.getInt(ii));
@@ -227,13 +227,14 @@ void DataFrame::fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set) {
 
         // TODO(mike) this loop is porrly written
         if (basecol->getType() == ne::ColumnType::STRING) {
-            auto newCol = std::make_shared<Column<std::string>>();
+            auto newCol = std::make_shared<Column<ExtString>>();
 
             ne::StringColumn* col = dynamic_cast<ne::StringColumn*>(basecol);
 
             for (size_t i = 0; i < col->getLength(); i++) {
                 if (col->isEntryPresent(i))
-                    newCol->push_back(std::string(col->getEntry(i)));
+                    newCol->push_back(
+                        std::make_shared<std::string>(col->getEntry(i)));
                 else {
                     // TODO(mike) how to handle missing entries?
                     // newCol->push_back()

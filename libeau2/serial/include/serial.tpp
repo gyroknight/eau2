@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include "key.hpp"
+
 class DataFrame;
-class Key;
 
 namespace Serial {
 template <typename T>
@@ -114,13 +115,13 @@ inline Type isType(const char* item) {
     return Type::String;
 }
 
-template <typename U>
-inline Type isType(ColPtr<U> item) {
+template <typename T>
+inline Type isType(ColPtr<T> col) {
     return Type::Column;
 }
 
 template <>
-inline Type isType(Key& item) {
+inline Type isType(Key item) {
     return Type::Key;
 }
 

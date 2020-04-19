@@ -53,7 +53,7 @@ size_t Row::width() { return _data.size(); }
 
 /** Type of the field at the given position. An idx >= width is  undefined.
  */
-char Row::col_type(size_t idx) { return _schema.col_type(idx); }
+char Row::col_type(size_t idx) { return _schema.colType(idx); }
 
 /** Given a Fielder, visit every field of this row. The first argument is
  * index of the row in the dataframe.

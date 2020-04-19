@@ -24,12 +24,13 @@ enum class Type {
     I32 = 5,
     U64 = 6,
     I64 = 7,
-    Float = 8,
-    Double = 9,
-    String = 10,
-    Column = 11,
-    Key = 12,
-    DataFrame = 13,
+    Bool = 8,
+    Float = 9,
+    Double = 10,
+    String = 11,
+    Column = 12,
+    Key = 13,
+    DataFrame = 14,
     Unknown
 };
 
@@ -51,6 +52,8 @@ inline Type valueToType(uint8_t value) {
             return Type::U64;
         case static_cast<uint8_t>(Type::I64):
             return Type::I64;
+        case static_cast<uint8_t>(Type::Bool):
+            return Type::Bool;
         case static_cast<uint8_t>(Type::Float):
             return Type::Float;
         case static_cast<uint8_t>(Type::Double):
@@ -86,6 +89,8 @@ inline uint8_t typeToValue(Type type) {
             return static_cast<uint8_t>(Type::U64);
         case Type::I64:
             return static_cast<uint8_t>(Type::I64);
+        case Type::Bool:
+            return static_cast<uint8_t>(Type::Bool);
         case Type::Float:
             return static_cast<uint8_t>(Type::Float);
         case Type::Double:
@@ -111,6 +116,9 @@ inline bool canSerializeTrivially(T value);
 
 template <typename T>
 inline Type isType(T item);
+
+template <typename T>
+inline Type isType(ColPtr<T> col);
 
 template <typename T>
 inline Type isColType(ColPtr<T> col);
