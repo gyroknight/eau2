@@ -67,6 +67,7 @@ TEST(SerialUnitTests, isType) {
     ASSERT_EQ(Serial::Type::I32, Serial::isType<int32_t>((int32_t)128));
     ASSERT_EQ(Serial::Type::U64, Serial::isType<uint64_t>((uint64_t)128));
     ASSERT_EQ(Serial::Type::I64, Serial::isType<int64_t>((int64_t)128));
+    ASSERT_EQ(Serial::Type::Bool, Serial::isType<bool>(true));
     ASSERT_EQ(Serial::Type::Float, Serial::isType<float>(1.0f));
     ASSERT_EQ(Serial::Type::Double, Serial::isType<double>((double)5.0));
 
@@ -84,7 +85,6 @@ TEST(SerialUnitTests, isType) {
 
     std::vector v{1, 2, 3};
     ASSERT_EQ(Serial::Type::Unknown, Serial::isType<decltype(v)>(v));
-    ASSERT_EQ(Serial::Type::Unknown, Serial::isType<bool>(true));
 }
 
 }  // namespace

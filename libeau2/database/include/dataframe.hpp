@@ -161,6 +161,12 @@ class DataFrame {
      * @param set   the set of columns
      */
     static void fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set);
+
+    /**
+     * @brief Mostly for debugging.
+     * 
+     */
+    void print();
 };
 
 #include "dataframe.tpp"

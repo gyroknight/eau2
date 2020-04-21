@@ -10,9 +10,16 @@
 
 #include <gtest/gtest.h>
 
+#include <mutex>
+#include <queue>
 #include <string>
+#include <vector>
 
 #include "commondefs.hpp"
+#include "dataframe.hpp"
+#include "key.hpp"
+#include "kvnet.hpp"
+#include "message.hpp"
 
 static const char col_types[] = {'I', 'B', 'D', 'S'};
 
@@ -37,15 +44,24 @@ static const char col_types[] = {'I', 'B', 'D', 'S'};
 
 // same as above but for pointers
 [[maybe_unused]] static bool isSchemaEq(const Schema* a, const Schema* b) {
-    if (a != b) return false;
+    if (a == b) return true;
     if (a != nullptr) return isSchemaEq(*a, *b);
 
     return true;
 }
 
+/**
+ * @brief Provides simple 3x4 dataframe.
+ * 
+ * column 1 <bool>:     true    false   true
+ * column 2 <int>:      10      -5      42
+ * column 3 <string>:   abc     def     ghi
+ * column 4 <double:    5.0     0.0     -10000.0
+ * 
+ */
 class FixtureWithSmallDataFrame : public ::testing::Test {
    protected:
-    DataFrame df;
+    DFPtr df;
     std::shared_ptr<Column<bool>> c1;
     std::shared_ptr<Column<int>> c2;
     std::shared_ptr<Column<ExtString>> c3;
@@ -55,11 +71,16 @@ class FixtureWithSmallDataFrame : public ::testing::Test {
     ExtString exts3;
     ExtString exts4;
 
-    FixtureWithSmallDataFrame() {
-        exts1 = std::make_shared<std::string>("abc");
-        exts2 = std::make_shared<std::string>("def");
-        exts3 = std::make_shared<std::string>("ghi");
-        exts4 = std::make_shared<std::string>("ghi");
+    FixtureWithSmallDataFrame()
+        : df(std::make_shared<DataFrame>()),
+          c1(std::make_shared<Column<bool>>()),
+          c2(std::make_shared<Column<int>>()),
+          c3(std::make_shared<Column<ExtString>>()),
+          c4(std::make_shared<Column<double>>()),
+          exts1(std::make_shared<std::string>("abc")),
+          exts2(std::make_shared<std::string>("def")),
+          exts3(std::make_shared<std::string>("ghi")),
+          exts4(std::make_shared<std::string>("ghi")) {
         c1->push_back(true);
         c1->push_back(false);
         c1->push_back(true);
@@ -73,9 +94,40 @@ class FixtureWithSmallDataFrame : public ::testing::Test {
         c4->push_back(0.0);
         c4->push_back(-10000.0);
 
-        df.addCol(c1, std::make_shared<std::string>("boolcol"));
-        df.addCol(c2, std::make_shared<std::string>("intcol"));
-        df.addCol(c3, std::make_shared<std::string>("ExtStringcol"));
-        df.addCol(c4, std::make_shared<std::string>("doublecol"));
+        df->addCol(c1, std::make_shared<std::string>("boolcol"));
+        df->addCol(c2, std::make_shared<std::string>("intcol"));
+        df->addCol(c3, std::make_shared<std::string>("ExtStringcol"));
+        df->addCol(c4, std::make_shared<std::string>("doublecol"));
     }
+};
+
+// mock KVNet to give to the KVStore
+class KVNetMock : public KVNet {
+   public:
+    std::queue<std::shared_ptr<Message>> nodeMsgs;
+
+   public:
+    KVNetMock() : KVNet() {}
+
+    virtual size_t registerNode(const char* port) override { return 0; }
+
+    virtual void send(std::shared_ptr<Message> msg) override {
+        nodeMsgs.push(msg);
+    }
+
+    virtual std::unique_ptr<Message> receive() override {
+        if (!nodeMsgs.empty()) {
+            auto msg = std::move(nodeMsgs.front());
+            nodeMsgs.pop();
+            return std::unique_ptr<Message>(msg.get());
+        }
+
+        return nullptr;
+    }
+};
+
+class FixtureWithKVStore : public FixtureWithSmallDataFrame {
+   protected:
+    std::unique_ptr<KVNet> net;
+    FixtureWithKVStore() : net(std::unique_ptr<KVNet>()) {}
 };
