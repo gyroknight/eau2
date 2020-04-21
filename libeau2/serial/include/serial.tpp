@@ -100,6 +100,12 @@ inline Type isType(double item) {
     return Type::Double;
 }
 
+// TODO(mike) get bools working
+// template <>
+// inline Type isType(bool item) {
+//     return Type::Bool;
+// }
+
 template <>
 inline Type isType(ExtString item) {
     return Type::String;

@@ -8,7 +8,11 @@
 
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include <string>
+
+#include "commondefs.hpp"
 
 static const char col_types[] = {'I', 'B', 'D', 'S'};
 
@@ -38,3 +42,40 @@ static const char col_types[] = {'I', 'B', 'D', 'S'};
 
     return true;
 }
+
+class FixtureWithSmallDataFrame : public ::testing::Test {
+   protected:
+    DataFrame df;
+    std::shared_ptr<Column<bool>> c1;
+    std::shared_ptr<Column<int>> c2;
+    std::shared_ptr<Column<ExtString>> c3;
+    std::shared_ptr<Column<double>> c4;
+    ExtString exts1;
+    ExtString exts2;
+    ExtString exts3;
+    ExtString exts4;
+
+    FixtureWithSmallDataFrame() {
+        exts1 = std::make_shared<std::string>("abc");
+        exts2 = std::make_shared<std::string>("def");
+        exts3 = std::make_shared<std::string>("ghi");
+        exts4 = std::make_shared<std::string>("ghi");
+        c1->push_back(true);
+        c1->push_back(false);
+        c1->push_back(true);
+        c2->push_back(10);
+        c2->push_back(-5);
+        c2->push_back(42);
+        c3->push_back(exts1);
+        c3->push_back(exts2);
+        c3->push_back(exts3);
+        c4->push_back(5.0);
+        c4->push_back(0.0);
+        c4->push_back(-10000.0);
+
+        df.addCol(c1, std::make_shared<std::string>("boolcol"));
+        df.addCol(c2, std::make_shared<std::string>("intcol"));
+        df.addCol(c3, std::make_shared<std::string>("ExtStringcol"));
+        df.addCol(c4, std::make_shared<std::string>("doublecol"));
+    }
+};
