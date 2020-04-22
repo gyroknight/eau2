@@ -19,7 +19,7 @@
 
 namespace {
 
-class PayloadTest : public FixtureWithKVStore {
+class PayloadTest : public FixtureWithSmallDataFrame {
    protected:
     /**
      * @brief manually deserializer
@@ -28,8 +28,8 @@ class PayloadTest : public FixtureWithKVStore {
      * @param i  the start index
      * @return uint64_t
      */
-    uint64_t manual_deserialize(std::shared_ptr<std::vector<uint8_t>> bytes,
-                                size_t i = 0) {
+    uint64_t manual_deserialize_uint64_t(
+        std::shared_ptr<std::vector<uint8_t>> bytes, size_t i = 0) {
         auto v = *bytes;
         return static_cast<uint64_t>(v[i]) |
                (static_cast<uint64_t>(v[i + 1]) << 8) |
@@ -120,6 +120,72 @@ TEST_F(PayloadTest, add_Key) {
     EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE + 5 + sizeof(size_t), bytes->size());
 }
 
+TEST_F(PayloadTest, add_ColPtrBool) {
+    Payload p;
+    Serializer ss;
+
+    p.add<bool>(c1);
+
+    EXPECT_EQ(Serial::Type::Column, p.type());
+
+    p.serialize(ss);
+
+    auto bytes = ss.generate();
+    EXPECT_EQ(
+        Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE + 3 * sizeof(bool),
+        bytes->size());
+}
+
+TEST_F(PayloadTest, add_ColPtrInt) {
+    Payload p;
+    Serializer ss;
+
+    p.add<int>(c2);
+
+    EXPECT_EQ(Serial::Type::Column, p.type());
+
+    p.serialize(ss);
+
+    auto bytes = ss.generate();
+    EXPECT_EQ(
+        Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE + 3 * sizeof(int),
+        bytes->size());
+}
+
+TEST_F(PayloadTest, add_ColPtrExtString) {
+    Payload p;
+    Serializer ss;
+
+    p.add<ExtString>(c3);
+
+    EXPECT_EQ(Serial::Type::Column, p.type());
+
+    p.serialize(ss);
+
+    auto bytes = ss.generate();
+    // 3 rows 4 chars each (with null terminator)
+    EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * 4 * sizeof(char),
+              bytes->size());
+}
+
+TEST_F(PayloadTest, add_ColPtrDouble) {
+    Payload p;
+    Serializer ss;
+
+    p.add<double>(c4);
+
+    EXPECT_EQ(Serial::Type::Column, p.type());
+
+    p.serialize(ss);
+
+    auto bytes = ss.generate();
+    // 3 rows 4 chars each (with null terminator)
+    EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * sizeof(double),
+              bytes->size());
+}
+
 // test for bool Payload::add(DFPtr value) {
 TEST_F(PayloadTest, add_DFPtr) {
     Payload p;
@@ -132,8 +198,20 @@ TEST_F(PayloadTest, add_DFPtr) {
     p.serialize(ss);
 
     auto bytes = ss.generate();
-    EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE,
-              bytes->size());  // TODO(mike) figure out the right size
+    EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE
+                  // bool column
+                  + Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * sizeof(bool)
+                  // int column
+                  + Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * sizeof(int)
+                  // ExtString column
+                  + Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * 4 * sizeof(char)
+                  // double column
+                  + Serial::PAYLOAD_HDR_SIZE + Serial::PAYLOAD_HDR_SIZE +
+                  3 * sizeof(double),
+              bytes->size());
 }
 
 // test for void Payload::serialize(Serializer& ss) {
@@ -152,18 +230,46 @@ TEST_F(PayloadTest, serialize) {
     Serial::Type type = Serial::valueToType(bytes->at(0));
     EXPECT_EQ(Serial::Type::U64, type);
 
-    uint64_t remaining = manual_deserialize(bytes, 1);
+    uint64_t remaining = manual_deserialize_uint64_t(bytes, 1);
     EXPECT_EQ(0, remaining);
 
-    uint64_t size = manual_deserialize(bytes, 1 + 8);
+    uint64_t size = manual_deserialize_uint64_t(bytes, 1 + 8);
     EXPECT_EQ(sizeof(uint64_t), size);
 
-    uint64_t val = manual_deserialize(bytes, 1 + 8 + 8);
+    uint64_t val = manual_deserialize_uint64_t(bytes, 1 + 8 + 8);
     EXPECT_EQ(0xDEADBEEF, val);
 }
 
+TEST_F(PayloadTest, serialize_col) {
+    Payload p;
+    Serializer ss;
+
+    ASSERT_TRUE(p.add<ExtString>(c3));
+    p.serialize(ss);
+
+    std::shared_ptr<std::vector<uint8_t>> bytes = ss.generate();
+
+    EXPECT_EQ(Serial::PAYLOAD_HDR_SIZE * 2 + 3 * 4 * sizeof(char),
+              bytes->size());
+
+    // get first string
+    unsigned char* a = bytes->data() + 2 * Serial::PAYLOAD_HDR_SIZE;
+    unsigned char* b = bytes->data() + 2 * Serial::PAYLOAD_HDR_SIZE + 4;
+    unsigned char* c = bytes->data() + 2 * Serial::PAYLOAD_HDR_SIZE + 8;
+
+    ASSERT_STREQ("abc", reinterpret_cast<char*>(a));
+    ASSERT_STREQ("def", reinterpret_cast<char*>(b));
+    ASSERT_STREQ("ghi", reinterpret_cast<char*>(c)); 
+}
+
 TEST_F(PayloadTest, serialize_df) {
-    // TODO(mike)
+    Payload p;
+    Serializer ss;
+
+    ASSERT_TRUE(p.add(df));
+    p.serialize(ss);
+
+    std::shared_ptr<std::vector<uint8_t>> bytes = ss.generate();
 }
 
 // test for BStreamIter Payload::deserialize(BStreamIter start, BStreamIter end)
@@ -189,10 +295,14 @@ TEST_F(PayloadTest, deserialize_simple) {
 }
 
 TEST_F(PayloadTest, deserialize_df) {
-    // TODO(mike)
+    Payload p;
+    Serializer ss;
+
+    ASSERT_TRUE(p.add(df));
+    p.serialize(ss);
 }
 
-// test for Key Payload::asKey() {
+// test for Key Payload::asKey()
 
 // test for DFPtr Payload::asDataFrame()
 TEST_F(PayloadTest, asDataFrame) {

@@ -20,11 +20,7 @@
 namespace {
 
 TEST(SerializerTest, basic) {
-    Serializer ss;
-
-    auto bytes = ss.generate();
-
-
+    
 }
 
 } // namespace
