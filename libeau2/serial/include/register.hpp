@@ -29,5 +29,7 @@ class Register : public Message {
    public:
     Register(in_addr_t address, in_port_t port);
 
+    struct sockaddr_in context();
+
     std::unique_ptr<std::vector<uint8_t>> serialize() override;
 };

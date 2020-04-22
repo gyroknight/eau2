@@ -48,7 +48,7 @@ class KVStore {
         _pendingMutex;  // ensures single read/write access to pending messages
 
     // Listening logic for handling network communications
-    void _listen();
+    void _listen(const char* address, const char* port);
 
     // Processes a reply and adds/redirects data as needed
     void _postReply(std::shared_ptr<Reply> reply);
@@ -60,9 +60,11 @@ class KVStore {
     // if added before the timeout finishes
     void _startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg);
 
+    void _readyGuard();
+
    public:
     // Constructs a KVStore using the communication layer provided
-    KVStore(KVNet& kvNet);
+    KVStore(KVNet& kvNet, const char* address, const char* port);
 
     // KVStores cannot be copied
     KVStore(const KVStore& other) = delete;

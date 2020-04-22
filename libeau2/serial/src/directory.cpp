@@ -14,7 +14,7 @@
 #include "serializer.hpp"
 
 Directory::Directory(uint64_t sender, uint64_t target, uint64_t idx)
-    : Message(MsgKind::Directory, sender, target, 0) {}
+    : Message(MsgKind::Directory, sender, target, 0), _idx(idx) {}
 
 void Directory::addNode(in_addr_t address, in_port_t port) {
     struct sockaddr_in node;

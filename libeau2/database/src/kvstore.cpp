@@ -27,13 +27,13 @@
 
 namespace {
 constexpr size_t WAIT_GET_TIMEOUT_S =
-    60;  // How long to wait for network responses before failing in seconds
-constexpr const char* PORT = "4500";
+    600;  // How long to wait for network responses before failing in seconds
 }  // namespace
 
 // Constructs a KVStore using the communication layer provided
-KVStore::KVStore(KVNet& kvNet) : _kvNet(kvNet) {
-    _listener = std::thread(&KVStore::_listen, this);
+KVStore::KVStore(KVNet& kvNet, const char* address, const char* port)
+    : _kvNet(kvNet) {
+    _listener = std::thread(&KVStore::_listen, this, address, port);
 }
 
 // Shuts down listener and destroys the KVStore
@@ -79,6 +79,7 @@ DFPtr KVStore::waitAndGet(const Key& key) {
 }
 
 void KVStore::fetch(const Key& key, bool wait) {
+    _readyGuard();
     if (key.home() != _idx) {
         const std::lock_guard<std::mutex> lock(_pendingMutex);
         if (wait) {
@@ -96,6 +97,7 @@ void KVStore::fetch(const Key& key, bool wait) {
 }
 
 void KVStore::push(const Key& key, DFPtr value) {
+    _readyGuard();
     if (key.home() == _idx) {
         insert(key, value);
     } else {
@@ -103,8 +105,8 @@ void KVStore::push(const Key& key, DFPtr value) {
     }
 }
 
-void KVStore::_listen() {
-    _idx = _kvNet.registerNode(PORT);
+void KVStore::_listen(const char* address, const char* port) {
+    _idx = _kvNet.registerNode(address, port);
     bool listening = true;
     while (listening) {
         std::shared_ptr<Message> msg = _kvNet.receive();
@@ -119,7 +121,8 @@ void KVStore::_listen() {
                       << std::endl;
             switch (msg->kind()) {
                 case MsgKind::Put:
-                    // Temp code
+                    // Temp code, for now we accept values without
+                    // acknowledgement, should eventually change in the future
                     putMsg = std::dynamic_pointer_cast<Put>(msg);
                     insert(putMsg->key(), putMsg->value());
                     break;
@@ -146,6 +149,8 @@ void KVStore::_listen() {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
+
+    _kvNet.~KVNet();
 }
 
 void KVStore::_postReply(std::shared_ptr<Reply> reply) {
@@ -197,4 +202,11 @@ void KVStore::_startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg) {
 
     std::thread thread(asyncResponse);
     thread.detach();
+}
+
+void KVStore::_readyGuard() {
+    if (!_kvNet.ready()) throw std::runtime_error("Network is not ready");
+    while (_idx == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }

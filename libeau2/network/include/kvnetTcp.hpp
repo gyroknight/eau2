@@ -12,6 +12,7 @@
 #include <sys/types.h>
 
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -36,37 +37,47 @@ class KVNetTCP : public KVNet {
     std::mutex _sendLock;  // sending queue lock
     std::mutex _receiveLock;          // receiving queue lock
     std::atomic_bool _netUp = false;  // is the network currently connected?
-    std::thread _sender;              // sends pending messages
-    std::thread _receiver;            // receives pending messages
+    std::thread _senderThread;        // sends pending messages
+    std::thread _receiverThread;      // receives pending messages
     std::unordered_map<uint64_t, uint16_t>
-        _sockfds;  // map of connections from node index to socket
-    std::shared_mutex _sockfdsLock;  // connection map lock
+        _sendSocks;  // map of connections from node index to socket
     uint64_t _idx =
         0;  // the index of this KVStore, populated by registerNode()
     std::vector<struct sockaddr_in>
         _dir;  // directory indexed by node to address and port
+    std::condition_variable
+        _senderCv;  // Wakes up the sender when messages are available to send
+
+    // Reads an entire Message from the socket specified
+    std::unique_ptr<Message> _readMsg(int sock);
 
     // Read a specific serial format
-    ssize_t _readPayload(uint64_t idx, std::vector<uint8_t>& msg);
-    ssize_t _readPut(uint64_t idx, std::vector<uint8_t>& msg);
-    ssize_t _readReply(uint64_t idx, std::vector<uint8_t>& msg);
-    ssize_t _readGet(uint64_t idx, std::vector<uint8_t>& msg);
-    ssize_t _readWaitAndGet(uint64_t idx, std::vector<uint8_t>& msg);
-    ssize_t _readDirectory(uint64_t idx, std::vector<uint8_t>& msg);
+    ssize_t _readPayload(int sock, std::vector<uint8_t>& msg);
+    ssize_t _readPut(int sock, std::vector<uint8_t>& msg);
+    ssize_t _readReply(int sock, std::vector<uint8_t>& msg);
+    ssize_t _readGet(int sock, std::vector<uint8_t>& msg);
+    ssize_t _readWaitAndGet(int sock, std::vector<uint8_t>& msg);
+    ssize_t _readDirectory(int sock, std::vector<uint8_t>& msg);
 
-    // Reads an entire Message from the node specified
-    std::unique_ptr<Message> _readMsg(uint64_t idx);
+    // Sender logic
+    void _sender();
+    // Receiver logic
+    void _receiver(const char* port);
+
+    bool _inDirectory(in_addr_t address);
 
    public:
     KVNetTCP();
-    ~KVNetTCP();
+    virtual ~KVNetTCP();
 
     // Registers this node with the registrar using the port provided
-    size_t registerNode(const char* port) override;
+    size_t registerNode(const char* address, const char* port) override;
 
     // Sends a message to the target encoded
     void send(std::shared_ptr<Message> msg) override;
 
     // Pops a received message if possible for processing
     std::unique_ptr<Message> receive() override;
+
+    bool ready() override;
 };

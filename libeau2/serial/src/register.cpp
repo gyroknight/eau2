@@ -19,6 +19,10 @@ Register::Register(in_addr_t address, in_port_t port)
     _context.sin_port = port;
 }
 
+struct sockaddr_in Register::context() {
+    return _context;
+}
+
 /**
  * @brief Register is represented as the following serial format:
  *

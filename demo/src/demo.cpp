@@ -6,9 +6,9 @@
 #include "key.hpp"
 
 namespace {
-Key main("main", 0);
-Key verify("verif", 0);
-Key check("ck", 0);
+Key main("main", 1);
+Key verify("verif", 1);
+Key check("ck", 1);
 }  // namespace
 
 Demo::Demo(size_t idx, KVStore& kv) : Application(idx, kv) {}

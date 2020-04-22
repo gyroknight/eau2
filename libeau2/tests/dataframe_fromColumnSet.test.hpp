@@ -2,21 +2,21 @@
  * @file dataframe_fromColumnSet.test.hpp
  * @author Vincent Zhao (zhao.v@northeastern.edu)
  * @author Michael Hebert (mike.s.hebert@gmail.com)
- * 
+ *
  * Lang::Cpp
  */
 
 #include <gtest/gtest.h>
 
-#include <queue>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <queue>
 
+#include "dataframe.hpp"
+#include "kill.hpp"
 #include "kvnet.hpp"
 #include "kvstore.hpp"
 #include "message.hpp"
-#include "kill.hpp"
-#include "dataframe.hpp"
 #include "sorer/column.h"
 
 // just a dummy implementation
@@ -32,7 +32,7 @@ class DemoNet : public KVNet {
         send(std::make_shared<Kill>(0, 0));
     }
 
-    size_t registerNode(const char* port) override {
+    size_t registerNode(const char* address, const char* port) override {
         return 0;
     }
 
@@ -63,10 +63,10 @@ char* cwc_strdup(const char* src) {
     return result;
 }
 
-
 // test fromColumnSet method
 
-// Currently commented out because the kvnet is not responding to kill messages correctly.
+// Currently commented out because the kvnet is not responding to kill messages
+// correctly.
 /*
 TEST(DataFrameTest, fromColumn) {
     DemoNet net;
@@ -79,8 +79,9 @@ TEST(DataFrameTest, fromColumn) {
     set.initializeColumn(2, ne::ColumnType::STRING);
 
     ne::BoolColumn* col1 = dynamic_cast<ne::BoolColumn*>(set.getColumn(0));
-    ne::IntegerColumn* col2 = dynamic_cast<ne::IntegerColumn*>(set.getColumn(1));
-    ne::StringColumn* col3 = dynamic_cast<ne::StringColumn*>(set.getColumn(2));
+    ne::IntegerColumn* col2 =
+dynamic_cast<ne::IntegerColumn*>(set.getColumn(1)); ne::StringColumn* col3 =
+dynamic_cast<ne::StringColumn*>(set.getColumn(2));
 
     // build columns
     col1->append(true);

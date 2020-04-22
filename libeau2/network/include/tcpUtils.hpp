@@ -133,8 +133,9 @@ inline ssize_t recvData(int socket, void* buf, size_t bytes) {
 // Receives bytes amount of data from socket and appends it to current
 inline ssize_t recvData(int socket, std::vector<uint8_t>& current,
                         size_t bytes) {
-    current.resize(current.size() + bytes);
-    uint8_t* dataStart = current.data() - bytes;
+    size_t currentSize = current.size();
+    current.resize(currentSize + bytes);
+    uint8_t* dataStart = current.data() + currentSize;
 
     return recvData(socket, dataStart, bytes);
 }

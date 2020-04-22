@@ -13,7 +13,7 @@
 #include "commondefs.hpp"
 namespace Serial {
 constexpr size_t CMD_HDR_SIZE = 25;
-constexpr size_t PAYLOAD_HDR_SIZE = 9;
+constexpr size_t PAYLOAD_HDR_SIZE = 17;
 
 enum class Type {
     U8 = 0,

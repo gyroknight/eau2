@@ -8,6 +8,7 @@ target_sources(demo
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/demo.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OptParser.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp")
 target_link_libraries(demo eau2)
 
