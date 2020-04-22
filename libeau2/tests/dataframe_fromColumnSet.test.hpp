@@ -18,43 +18,7 @@
 #include "kvstore.hpp"
 #include "message.hpp"
 #include "sorer/column.h"
-
-// just a dummy implementation
-class DemoNet : public KVNet {
-   public:
-    std::queue<std::shared_ptr<Message>> _txrx;
-    std::mutex mutex;
-
-    DemoNet() {}
-
-    ~DemoNet() {
-        // kill the kvstore
-        send(std::make_shared<Kill>(0, 0));
-    }
-
-    size_t registerNode(const char* address, const char* port) override {
-        return 0;
-    }
-
-    void send(std::shared_ptr<Message> msg) override {
-        uint64_t target = msg->target();
-        const std::lock_guard<std::mutex> targetLock(mutex);
-
-        _txrx.push(msg);
-    }
-
-    std::unique_ptr<Message> receive() override {
-        const std::lock_guard<std::mutex> senderLock(mutex);
-
-        if (!_txrx.empty()) {
-            auto msg = _txrx.front();
-            _txrx.pop();
-            return Message::deserialize(msg->serialize());
-        }
-
-        return nullptr;
-    }
-};
+#include "testutils.hpp"
 
 // Necessary to avoid segfaults with deleting string literals
 char* cwc_strdup(const char* src) {
@@ -69,7 +33,7 @@ char* cwc_strdup(const char* src) {
 // correctly.
 /*
 TEST(DataFrameTest, fromColumn) {
-    DemoNet net;
+    KVNetMock net;
     KVStore kv(net);
     Key k("dataf", 0);
 

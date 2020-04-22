@@ -19,6 +19,7 @@
 #include "dataframe.hpp"
 #include "key.hpp"
 #include "kvnet.hpp"
+#include "kvstore.hpp"
 #include "message.hpp"
 
 static const char col_types[] = {'I', 'B', 'D', 'S'};
@@ -122,15 +123,27 @@ class KVNetMock : public KVNet {
         if (!nodeMsgs.empty()) {
             auto msg = std::move(nodeMsgs.front());
             nodeMsgs.pop();
-            return std::unique_ptr<Message>(msg.get());
+            return Message::deserialize(msg->serialize());
         }
 
         return nullptr;
     }
+
+    virtual bool ready() override { return true; }
+
+    virtual void shutdown() override {}
 };
 
 class FixtureWithKVStore : public FixtureWithSmallDataFrame {
    protected:
-    std::unique_ptr<KVNet> net;
-    FixtureWithKVStore() : net(std::unique_ptr<KVNet>()) {}
+    std::unique_ptr<KVNetMock> net;
+    std::unique_ptr<KVStore> store;
+    std::unique_ptr<Key> key;
+
+    FixtureWithKVStore()
+        : net(std::make_unique<KVNetMock>()),
+          store(std::make_unique<KVStore>(*net, "address", "port")),
+          key(std::make_unique<Key>("dataframe", 0)) {
+        store->insert(*key, df);
+    }
 };

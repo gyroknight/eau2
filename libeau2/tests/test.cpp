@@ -19,6 +19,7 @@
 #include "serial.test.hpp"
 #include "serializer.test.hpp"
 #include "payload.test.hpp"
+#include "message.test.hpp"
 
 int main(int argc, char** argv) {
     std::cout << "test" << std::endl;
