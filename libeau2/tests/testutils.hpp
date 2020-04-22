@@ -52,12 +52,12 @@ static const char col_types[] = {'I', 'B', 'D', 'S'};
 
 /**
  * @brief Provides simple 3x4 dataframe.
- * 
+ *
  * column 1 <bool>:     true    false   true
  * column 2 <int>:      10      -5      42
  * column 3 <string>:   abc     def     ghi
  * column 4 <double:    5.0     0.0     -10000.0
- * 
+ *
  */
 class FixtureWithSmallDataFrame : public ::testing::Test {
    protected:
@@ -109,7 +109,10 @@ class KVNetMock : public KVNet {
    public:
     KVNetMock() : KVNet() {}
 
-    virtual size_t registerNode(const char* port) override { return 0; }
+    virtual size_t registerNode(const char* address,
+                                const char* port) override {
+        return 0;
+    }
 
     virtual void send(std::shared_ptr<Message> msg) override {
         nodeMsgs.push(msg);
