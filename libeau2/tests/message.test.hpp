@@ -48,15 +48,15 @@ class MessageTest : public FixtureWithKVStore {
 
 // test for serialize();
 TEST_F(MessageTest, serialize) {
-    Ack ack(0, 1, 2);
+    Ack ack(1, 1, 2);
     auto bytes = ack.serialize();
     EXPECT_EQ(Serial::CMD_HDR_SIZE, bytes->size());
 
-    Directory directory(0, 1, 2);
+    Directory directory(1, 1, 2);
     bytes = directory.serialize();
     EXPECT_EQ(Serial::CMD_HDR_SIZE + sizeof(uint64_t) * 2, bytes->size());
 
-    Get get(0, 1, *key);
+    Get get(1, 1, *key);
     bytes = get.serialize();
     EXPECT_EQ(Serial::CMD_HDR_SIZE
                   // column/row idx

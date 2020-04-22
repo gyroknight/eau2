@@ -112,7 +112,7 @@ class KVNetMock : public KVNet {
 
     virtual size_t registerNode(const char* address,
                                 const char* port) override {
-        return 0;
+        return 1;
     }
 
     virtual void send(std::shared_ptr<Message> msg) override {
