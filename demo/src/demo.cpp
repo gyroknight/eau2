@@ -35,6 +35,7 @@ void Demo::producer() {
     DataFrame::fromArray(&main, &kv, SZ, vals);
     DataFrame::fromScalar(&check, &kv, sum);
     std::cout << "producer() complete." << std::endl;
+    delete vals;
 }
 
 void Demo::counter() {
