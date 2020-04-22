@@ -295,3 +295,9 @@ void DataFrame::fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set) {
 
     kv->push(*key, df);
 }
+
+void DataFrame::print() {
+    for (size_t i = 0; i < ncols(); i++) {
+        std::cout << "Column " << i << ": " << _data.at(i)->str() << std::endl;
+    }
+}

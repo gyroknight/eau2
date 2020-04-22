@@ -210,6 +210,9 @@ void Payload::_serializeDataFrame(Serializer& ss) {
                 col.add(
                     std::dynamic_pointer_cast<Column<int64_t>>(df->_data[ii]));
                 break;
+            case Serial::Type::Bool:
+                col.add(std::dynamic_pointer_cast<Column<bool>>(df->_data[ii]));
+                break;
             case Serial::Type::Float:
                 col.add(
                     std::dynamic_pointer_cast<Column<float>>(df->_data[ii]));
@@ -267,6 +270,9 @@ BStreamIter Payload::_deserializeColumn(uint64_t& payloadsLeft,
         case Serial::Type::I64:
             _unpackAsCol<int64_t>(colData, payloadsLeft);
             break;
+        case Serial::Type::Bool:
+            _unpackAsCol<bool>(colData, payloadsLeft);
+            break;
         case Serial::Type::Float:
             _unpackAsCol<float>(colData, payloadsLeft);
             break;
@@ -319,6 +325,9 @@ BStreamIter Payload::_deserializeDataFrame(uint64_t& payloadsLeft,
                 break;
             case Serial::Type::I64:
                 df->addCol(std::static_pointer_cast<Column<int64_t>>(col._ref));
+                break;
+            case Serial::Type::Bool:
+                df->addCol(std::static_pointer_cast<Column<bool>>(col._ref));
                 break;
             case Serial::Type::Float:
                 df->addCol(std::static_pointer_cast<Column<float>>(col._ref));

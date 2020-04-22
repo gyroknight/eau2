@@ -36,6 +36,7 @@ inline bool canSerializeTrivially(T value) {
         case Type::I32:
         case Type::U64:
         case Type::I64:
+        case Type::Bool:
         case Type::Float:
         case Type::Double:
         case Type::String:
@@ -88,6 +89,11 @@ inline Type isType(uint64_t item) {
 template <>
 inline Type isType(int64_t item) {
     return Type::I64;
+}
+
+template <>
+inline Type isType(bool item) {
+    return Type::Bool;
 }
 
 template <>
