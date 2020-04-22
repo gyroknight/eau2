@@ -20,9 +20,9 @@ These Applications can define a wide range of functionality, for example countin
 
 The Key-Value store is an abstraction layer on top of the networking layer. In addition to providing the application layer with access to dataframes, it is also used by network nodes to get other data types such as columns from other nodes.
 
-This layer supports the methods `put(k, v)`, `get(k)`, and `getAndWait(k) (blocking)`. These methods interact with local data (`get`) and data on other nodes (`put`, `getAndWait`).
+This layer supports methods to operate on a local store, as well as retrieving data from other stores on the network.
 
-3. Networking and Concurrency Control *(partially implemented)*
+3. Networking and Concurrency Control
 
 The network layer has one registrar node and many other worker nodes. The registrar node's purpose is to tell worker nodes about each other, so that they can send data directly between one another.
 
@@ -30,33 +30,43 @@ Each worker node runs an Application. This can do the same thing for all nodes, 
 
 ## Implementation
 
-### Classes and Code Organization
+### libeau2
 
-#### demo
+Most of the codebase lives in the `libeau2` directory, which is built as a static library. Application code then links to this library and includes the header files in the various `include/` directories.
 
-This directory contains application code which utilizes the libeau2 and libsorer libraries.
+*A quick note about the include directory: only .hpp files should be included in application code. The .tpp files are included at the end of the headers. It is done this way so that the template definitions are shared among translation units.*
 
-`Application`: Abstract class for application code.
+`libeau2` is further divided into the `database`, `network`, and `serial` directories (and `tests` of course).
 
-Provides utilities such as `this_node()` which assigns indices to each node. Implementing classes must override the `void run_()` method - this is the entry point for the application.
+#### /database
 
-#### libeau2/database
+The `database` directory contains code for storing and indexing data locally - so it includes classes like `DataFrame` and `Column`, for storing large amounts of arbitrary data, and the `KVStore`/`Key` classes for assigning keys to those `DataFrame`s.
 
-This directory contains code related to DataFrames and the KVStores containing them.
+Several common typedefs are defined here:
 
-`DataFrame`: The main value type accessed by application code.
+| alias         | type                             |
+|---------------|----------------------------------|
+| `ExtString`   | std::shared_ptr<std::string>     |
+| `DFPtr`       | std::shared_ptr<DataFrame>       |
+| `ColPtr<T>`   | std::shared_ptr<Column<T>>       |
+| `ColIPtr`     | std::shared_ptr<ColumnInterface> |
+| `BStreamIter` | std::vector<uint8_t>::iterator   |
 
-Provides the static methods `fromArray(arr)` and `fromScalar(scalar)` for creating single-column and single-element dataframes, e.g. for lists of data or signals/wait variables, respectively.
+What follows is a description of the main `database` and ancillary classes.
 
-Internally stores data in `Column<T>`s,
+`ColumnInterface/Column<T>`: A collection of the same type of data.
 
-`Column<T>`: where `T` is one of `{int, double, bool, std::string}`.
-
-A column is essentially a vector of `Chunk<T>` references.
+Interface and generic implementation for columns of data. Any datatype `T` is supported for these classes. Columns are essentially wrappers for a vector of `Chunk`s and some serialization methods (these methods will be explained in more detail in the **serial** section of this report).
 
 `Chunk<T>`: a fixed-size collection of data.
 
 Chunks are more-or-less uniformly scattered throughout the network. A single `Column` does not usually have all of its `Chunk`s locally stored.
+
+`DataFrame`: A set of data columns.
+
+Although `Column<T>` allows for any templated type, `DataFrames` only support `int`-, `bool`-, `ExtString`-, and `double`-type columns.
+
+Provides the static methods `fromArray(arr)` and `fromScalar(scalar)` for creating single-column and single-element dataframes, e.g. for lists of data or signals/wait variables, respectively.
 
 `Row`: non-owning row of data in a DataFrame
 
@@ -70,11 +80,13 @@ Chunks are more-or-less uniformly scattered throughout the network. A single `Co
 
 This is the class which the application layer uses to interact with the cluster. Each application gets its own KVStore, but they are linked together over the network so that methods like `waitAndGet` will ask the network for the key's location and transfer the data accordingly, opaque to the application user.
 
+Supports the methods `insert(k, v)`, `waitAndGet(k)`, `fetch(k, timeout)`, and `push(k, v)`. The `insert` and `waitAndGet` methods operate on the local data store. The store utilizes the network layer in order to send/receieve values to/from other stores on the network.
+
 `Key`: the key for KVStores
 
-Just a key and a home node.
+Just a key and a home node. Used by `KVStore`. 
 
-#### libeau2/network
+#### /network
 
 This directory contains classes related to networking. *(these classes are not fully fleshed out)*
 
@@ -90,7 +102,11 @@ This class is what the final eau2 project uses.
 
 This class is not fully implemented, however, it would represent the master node for the system - dealing with registrations from worker nodes and telling them about each other.
 
-#### libeau2/serial
+`tcpUtils.hpp`: Adds some wrappers around POSIX sockets.
+
+These methods are added to the `TCP::` namespace. For example, adds a method to sequentially send all elements of a byte vector to a socket.
+
+#### /serial
 
 This directory contains classes related to serialization and messaging.
 
@@ -114,7 +130,7 @@ Passing various datatypes into the Payload's constructor will convert those data
 
 These are used by KVNets to send/receive message to/from the network.
 
-#### libsorer
+### libsorer
 
 This directory is a slightly modified version of https://github.ccs.neu.edu/euhlmann/CS4500-A1-part1.
 
@@ -124,66 +140,16 @@ We also added a static `DataFrame::fromColumnSet` method which takes the output 
 
 ## Use Cases
 
-#### Toy example
+### Current Demo - Summarizer
 
-*This example will not run with the repo in its current state. We need more work on the networking side.*
+For a simple example, an application could split nodes into 'producers' which generate new data and place it in a dataframe, 'counters' which take that data and sum it, and `summarizers`, which wait for the count to be completed and print the final result.
 
-For a simple example, an application could split nodes into 'producers' which generate new data and place it in a dataframe, 'counters' which take that data and sum it, and `summarizers`, which wait for the count to be completed and print the final result:
-
-```cpp
-class Demo : public Application {
-public:
-  Key main("main",0);
-  Key verify("verif",0);
-  Key check("ck",0);
-
-  Demo(size_t idx): Application(idx) {}
-
-  void run_() override {
-
-    // switching on this_node() to split the roles up evenly over the cluster
-    switch(this_node()) {
-    case 0:   producer();     break;
-    case 1:   counter();      break;
-    case 2:   summarizer();
-   }
-  }
-
-  // if the node is a producer, it will generate data and place it in the main
-  // kv. It will also store the sum in the check kv.
-  void producer() {
-    size_t SZ = 100*1000;
-    double* vals = new double[SZ];
-    double sum = 0;
-    for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
-    DataFrame::fromArray(&main, &kv, SZ, vals);
-    DataFrame::fromScalar(&check, &kv, sum);
-  }
-
-  // if the node is a counter, it will sum the data in the main kv and place it
-  // in the sum kv.
-  void counter() {
-    DataFrame* v = kv.waitAndGet(main);
-    size_t sum = 0;
-    for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
-    p("The sum is  ").pln(sum);
-    DataFrame::fromScalar(&verify, &kv, sum);
-  }
-
-  // finally, summarizers just wait for the verify signal from the counter nodes
-  // and print the results.
-  void summarizer() {
-    DataFrame* result = kv.waitAndGet(verify);
-    DataFrame* expected = kv.waitAndGet(check);
-    pln(expected->get_double(0,0)==result->get_double(0,0) ? "SUCCESS":"FAILURE");
-  }
-};
-```
+The code for this example can be found in the `demo/` directory.
 
 ## Open Questions
 
 - Should reimplement euhlmann's SoRer using our Column classes so we can read a .sor file directly into a DataFrame, as opposed to copying their columns.
-- The network layer doesn't really work. It is close, but there are some missing features - the registrar doesn't work.
+- The network layer sometimes has trouble shutting down
 
 ## Status
 

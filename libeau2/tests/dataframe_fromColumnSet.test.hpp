@@ -31,10 +31,10 @@ char* cwc_strdup(const char* src) {
 
 // Currently commented out because the kvnet is not responding to kill messages
 // correctly.
-/*
+
 TEST(DataFrameTest, fromColumn) {
     KVNetMock net;
-    KVStore kv(net);
+    KVStore kv(net, "address", "port");
     Key k("dataf", 0);
 
     ne::ColumnSet set(3);
@@ -68,6 +68,5 @@ dynamic_cast<ne::StringColumn*>(set.getColumn(2));
 
     ASSERT_EQ(true, df->getBool(0, 0));
     ASSERT_EQ(-5, df->getInt(1, 1));
-    ASSERT_TRUE(strcmp("yes", df->getString(2, 2)->c_str()));
+    ASSERT_STREQ("yes", df->getString(2, 2)->c_str());
 }
-*/
