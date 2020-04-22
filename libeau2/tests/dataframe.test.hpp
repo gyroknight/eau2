@@ -1,14 +1,25 @@
+/**
+ * @file dataframe.test.hpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
 
 #include <cassert>
 #include <chrono>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <queue>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include "dataframe.hpp"
 #include "rower.hpp"
+
+#include "sorer/parser.h"
 
 // A basic Rower to sum up the elements in a row
 class SumInt : public Rower {

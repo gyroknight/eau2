@@ -1,15 +1,22 @@
-// lang::Cpp
+/**
+ * @file row-fielder.test.hpp
+ * @author Vincent Zhao (zhao.v@northeastern.edu)
+ * @author Michael Hebert (mike.s.hebert@gmail.com)
+ * 
+ * Lang::Cpp
+ */
+
 #pragma once
 #include <gtest/gtest.h>
 
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "testutils.hpp"
 #include "fielder.hpp"
 #include "row.hpp"
+#include "testutils.hpp"
 
 namespace {
 
@@ -18,34 +25,33 @@ class RowTest : public testing::Test {
     RowTest() {}
     ~RowTest() {}
 
-    template<typename... Args>
+    template <typename... Args>
     std::shared_ptr<Schema> MakeSchema(Args... args) {
         auto schema = std::make_shared<Schema>(args...);
         schemas.push_back(schema);
         return schema;
     }
 
-    template<typename... Args>
+    template <typename... Args>
     std::shared_ptr<Schema> MakeSchema(int height, Args... args) {
         auto schema = std::make_shared<Schema>(args...);
         schemas.push_back(schema);
 
         for (int i = 0; i < height; i++) {
-            schema->add_row(std::to_string(i));
+            schema->addRow(std::make_shared<std::string>(std::to_string(i)));
         }
 
         return schema;
     }
 
-     std::vector<std::shared_ptr<Schema>> schemas;
+    std::vector<std::shared_ptr<Schema>> schemas;
 };
-
 
 TEST_F(RowTest, construct_empty) {
     Row r(*MakeSchema());
 
     ASSERT_EQ(0, r.width());
-} 
+}
 
 TEST_F(RowTest, construct_many) {
     Row r(*MakeSchema("IDBS"));
@@ -80,14 +86,14 @@ class RowTestExample : public RowTest {
 TEST_F(RowTestExample, set_and_get) {
     ASSERT_EQ(1.0, r.getDouble(0));
     ASSERT_EQ(true, r.getBool(1));
-    ASSERT_EQ(5,    r.getInt(2));
+    ASSERT_EQ(5, r.getInt(2));
     ASSERT_EQ(5.0, r.getDouble(3));
-    ASSERT_EQ(-10,  r.getInt(4));
+    ASSERT_EQ(-10, r.getInt(4));
     ASSERT_EQ(0.5, r.getDouble(5));
-    ASSERT_EQ(false,    r.getBool(6));
-    ASSERT_EQ(1,    r.getInt(7));
-    ASSERT_EQ(2,    r.getInt(8));
-    ASSERT_EQ(3,    r.getInt(9));
+    ASSERT_EQ(false, r.getBool(6));
+    ASSERT_EQ(1, r.getInt(7));
+    ASSERT_EQ(2, r.getInt(8));
+    ASSERT_EQ(3, r.getInt(9));
     ASSERT_STREQ("Hello", r.getString(10)->c_str());
 }
 
@@ -122,20 +128,20 @@ class RowTestExampleFielder : public Fielder {
     RowTestExampleFielder(std::vector<std::string>& v) : v_(v) {}
 
     virtual void start(size_t r) override {
-        v_.push_back(std::move("start:") + std::to_string(r));
+        v_.push_back("start:" + std::to_string(r));
     }
 
     virtual void accept(bool b) override {
-        v_.push_back(std::move("bool:" + std::to_string(b)));
+        v_.push_back("bool:" + std::to_string(b));
     }
     virtual void accept(double f) override {
-        v_.push_back(std::move("double:" + std::to_string(f)));
+        v_.push_back("double:" + std::to_string(f));
     }
     virtual void accept(int i) override {
-        v_.push_back(std::move("int:" + std::to_string(i)));
+        v_.push_back("int:" + std::to_string(i));
     }
     virtual void accept(std::shared_ptr<std::string> s) override {
-        v_.push_back(std::move(std::string("string:") + s->c_str()));
+        v_.push_back(std::string("string:") + s->c_str());
     }
 
     virtual void done() override { v_.emplace_back("done"); }
@@ -154,19 +160,19 @@ TEST_F(RowTestExample, visit) {
 
     ASSERT_EQ(13, fielderout.size());
 
-    ASSERT_EQ("start:0",        fielderout[0]);
-    ASSERT_EQ("double:1.000000",   fielderout[1]);
-    ASSERT_EQ("bool:1",    fielderout[2]);
-    ASSERT_EQ("int:5",        fielderout[3]);
-    ASSERT_EQ("double:5.000000",   fielderout[4]);
-    ASSERT_EQ("int:-10",      fielderout[5]);
-    ASSERT_EQ("double:0.500000",   fielderout[6]);
-    ASSERT_EQ("bool:0",   fielderout[7]);
-    ASSERT_EQ("int:1",        fielderout[8]);
-    ASSERT_EQ("int:2",        fielderout[9]);
-    ASSERT_EQ("int:3",        fielderout[10]);
+    ASSERT_EQ("start:0", fielderout[0]);
+    ASSERT_EQ("double:1.000000", fielderout[1]);
+    ASSERT_EQ("bool:1", fielderout[2]);
+    ASSERT_EQ("int:5", fielderout[3]);
+    ASSERT_EQ("double:5.000000", fielderout[4]);
+    ASSERT_EQ("int:-10", fielderout[5]);
+    ASSERT_EQ("double:0.500000", fielderout[6]);
+    ASSERT_EQ("bool:0", fielderout[7]);
+    ASSERT_EQ("int:1", fielderout[8]);
+    ASSERT_EQ("int:2", fielderout[9]);
+    ASSERT_EQ("int:3", fielderout[10]);
     ASSERT_EQ("string:Hello", fielderout[11]);
-    ASSERT_EQ("done",         fielderout[12]);
+    ASSERT_EQ("done", fielderout[12]);
 }
 
 }  // namespace

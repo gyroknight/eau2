@@ -2,4 +2,6 @@
 .vscode/
 *.swp
 build/
-sorer/
+submission.zip
+data/
+build.log

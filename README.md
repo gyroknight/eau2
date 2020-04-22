@@ -2,8 +2,6 @@
 
 To build and test
 ```sh
-mkdir build
-cd build
-cmake ..
-make test # runs test
+cmake -S . -B build
+cmake --build build --target test # runs test
 ```
