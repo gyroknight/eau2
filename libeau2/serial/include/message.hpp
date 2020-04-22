@@ -14,8 +14,6 @@
 #include <memory>
 #include <vector>
 
-#include "commondefs.hpp"
-
 class Serializer;
 
 /**

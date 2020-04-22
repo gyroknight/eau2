@@ -18,6 +18,7 @@
 #include "column.hpp"
 #include "dataframe.hpp"
 #include "key.hpp"
+#include "schema.hpp"
 #include "serial.hpp"
 #include "serializer.hpp"
 

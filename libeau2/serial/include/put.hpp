@@ -16,8 +16,6 @@
 #include "key.hpp"
 #include "message.hpp"
 
-class Key;
-
 // Puts data from one node to another, ranging from entire DFs to single items
 class Put : public Message {
    private:

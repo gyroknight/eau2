@@ -14,11 +14,13 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <stack>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "directory.hpp"
@@ -36,7 +38,12 @@ constexpr int POLL_TIMEOUT_MS = 500;
 
 KVNetTCP::KVNetTCP() {}
 KVNetTCP::~KVNetTCP() {
-    if (_netUp) shutdown();
+    shutdown();
+    std::cout << "Shutting down network...";
+    // Wait for sender and receiver to stop
+    _senderThread.join();
+    _receiverThread.join();
+    std::cout << " done." << std::endl;
 }
 
 // Registers node with the registrar and awaits directory before starting sender
@@ -137,16 +144,7 @@ bool KVNetTCP::ready() {
     return _netUp;
 }
 
-void KVNetTCP::shutdown() {
-    std::cout << "Shutting down network...";
-    // Net is down
-    _netUp = false;
-
-    // Wait for sender and receiver to stop
-    _senderThread.join();
-    _receiverThread.join();
-    std::cout << " done." << std::endl;
-}
+void KVNetTCP::shutdown() { _netUp = false; }
 
 // Reads in Message bytestream from node and deserializes
 std::unique_ptr<Message> KVNetTCP::_readMsg(int sock) {
@@ -402,7 +400,7 @@ void KVNetTCP::_receiver(const char* port) {
         throw std::runtime_error("Failed to create epoll instance");
     }
 
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLRDHUP;
     ev.data.fd = listenSock;
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listenSock, &ev) == -1) {
         throw std::runtime_error("Failed to add listen socket to epoll");
@@ -410,7 +408,7 @@ void KVNetTCP::_receiver(const char* port) {
     sockfds.push_back(epollfd);
     std::cout << "epoll socket is " << epollfd << std::endl;
 
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLRDHUP;
     ev.data.fd = _sendSocks[0];
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sendSocks[0], &ev) == -1) {
         throw std::runtime_error("Failed to add registrar socket to epoll");
@@ -429,7 +427,12 @@ void KVNetTCP::_receiver(const char* port) {
         readyfds = epoll_wait(epollfd, events, MAX_EVENTS, POLL_TIMEOUT_MS);
 
         for (int ii = 0; ii < readyfds; ii++) {
-            if (events[ii].data.fd == listenSock) {
+            std::cout << "Event: " << std::hex << events[ii].events
+                      << std::endl;
+            if (events[ii].events & EPOLLRDHUP) {
+                std::cerr << "Socket disconnected\n";
+                shutdown();
+            } else if (events[ii].data.fd == listenSock) {
                 int connSock = accept(
                     listenSock, reinterpret_cast<struct sockaddr*>(&connAddr),
                     &addrLen);
@@ -446,14 +449,14 @@ void KVNetTCP::_receiver(const char* port) {
                     continue;
                 }
 
-                ev.events = EPOLLIN;
+                ev.events = EPOLLIN | EPOLLRDHUP;
                 ev.data.fd = connSock;
                 if (epoll_ctl(epollfd, EPOLL_CTL_ADD, connSock, &ev) == -1)
                     throw std::runtime_error(
                         "Unable to add connection socket to epoll");
                 sockfds.push_back(connSock);
                 std::cout << "Added new connection " << connSock << std::endl;
-            } else {
+            } else if (events[ii].events & EPOLLIN) {
                 std::unique_ptr<Message> msg = _readMsg(events[ii].data.fd);
 
                 if (!msg) {

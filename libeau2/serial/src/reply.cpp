@@ -9,8 +9,10 @@
 #include "reply.hpp"
 
 #include <cstdio>
+#include <iostream>
 
 #include "payload.hpp"
+#include "serial.hpp"
 #include "serializer.hpp"
 
 Reply::Reply(size_t sender, size_t target, size_t id)

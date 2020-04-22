@@ -122,7 +122,7 @@ inline ssize_t recvData(int socket, void* buf, size_t bytes) {
 
     while (totalRecvd < bytes) {
         recvd = recv(socket, dataStart + totalRecvd, bytesLeft, 0);
-        if (recvd == -1) break;
+        if (recvd == -1 || recvd == 0) break;
         totalRecvd += recvd;
         bytesLeft += recvd;
     }

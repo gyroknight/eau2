@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+#include "commondefs.hpp"
 #include "key.hpp"
 #include "message.hpp"
 

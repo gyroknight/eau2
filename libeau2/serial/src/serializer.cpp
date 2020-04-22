@@ -12,9 +12,6 @@
 #include <string>
 #include <utility>
 
-#include "key.hpp"
-#include "payload.hpp"
-
 Serializer::Serializer() {}
 
 template <>

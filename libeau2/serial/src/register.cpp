@@ -10,6 +10,9 @@
 
 #include <sys/socket.h>
 
+#include <iostream>
+#include <iterator>
+
 #include "serializer.hpp"
 
 Register::Register(in_addr_t address, in_port_t port)

@@ -10,14 +10,13 @@
 
 #include <cassert>
 #include <cstdio>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <thread>
 
-#include "chunk.hpp"
 #include "column.hpp"
 #include "kvstore.hpp"
-#include "payload.hpp"
 #include "row.hpp"
 #include "rower.hpp"
 #include "schema.hpp"

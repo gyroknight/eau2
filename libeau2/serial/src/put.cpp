@@ -8,7 +8,12 @@
 
 #include "put.hpp"
 
+#include <iostream>
+#include <iterator>
+
 #include "key.hpp"
+#include "payload.hpp"
+#include "serial.hpp"
 #include "serializer.hpp"
 
 Put::Put(uint64_t sender, const Key& key, DFPtr value, uint64_t colIdx,

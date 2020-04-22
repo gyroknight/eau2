@@ -8,6 +8,11 @@
 
 #include "get.hpp"
 
+#include <iostream>
+#include <iterator>
+
+#include "payload.hpp"
+#include "serial.hpp"
 #include "serializer.hpp"
 
 Get::Get(MsgKind kind, uint64_t sender, uint64_t target, const Key& key,

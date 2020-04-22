@@ -8,8 +8,13 @@
 
 #include "waitandget.hpp"
 
+#include <iostream>
+#include <iterator>
+
 #include "key.hpp"
 #include "message.hpp"
+#include "payload.hpp"
+#include "serial.hpp"
 #include "serializer.hpp"
 
 WaitAndGet::WaitAndGet(uint64_t sender, uint64_t target, const Key& key,

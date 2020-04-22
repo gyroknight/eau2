@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "commondefs.hpp"
+#include "key.hpp"
 #include "serial.hpp"
 
 class Serializer;

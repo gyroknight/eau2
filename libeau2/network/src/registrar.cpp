@@ -23,7 +23,7 @@
 
 namespace {
 constexpr const char* PORT = "4500";
-constexpr size_t NUM_NODES = 3;
+constexpr size_t NUM_NODES = 1;
 constexpr size_t MAX_EVENTS = 10;
 }  // namespace
 
@@ -46,7 +46,7 @@ void Registrar::start() {
         throw std::runtime_error("Failed to create epoll instance");
     }
 
-    ev.events = EPOLLIN;
+    ev.events = EPOLLIN | EPOLLRDHUP;
     ev.data.fd = _sockfd;
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sockfd, &ev) == -1) {
         throw std::runtime_error("Failed to add listen socket to epoll");
@@ -61,7 +61,11 @@ void Registrar::start() {
         readyfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 
         for (int ii = 0; ii < readyfds; ii++) {
-            if (events[ii].data.fd == _sockfd) {
+            if (events[ii].events & EPOLLRDHUP) {
+                std::cerr << "Socket disconnected\n";
+                stop();
+                return;
+            } else if (events[ii].data.fd == _sockfd) {
                 int connSock = accept(
                     _sockfd, reinterpret_cast<struct sockaddr*>(&connAddr),
                     &addrLen);
@@ -78,7 +82,7 @@ void Registrar::start() {
                 //     throw std::runtime_error(
                 //         "Failed to set connection as nonblocking");
 
-                ev.events = EPOLLIN;
+                ev.events = EPOLLIN | EPOLLRDHUP;
                 ev.data.fd = connSock;
                 if (epoll_ctl(epollfd, EPOLL_CTL_ADD, connSock, &ev) == -1)
                     throw std::runtime_error(
@@ -159,7 +163,7 @@ int main(int argc, char* argv[]) {
     // while (true) {
     //     usleep(1);
     // }
-    sleep(15);
+    sleep(5);
 
     registrar.stop();
 

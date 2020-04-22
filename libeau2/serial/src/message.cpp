@@ -8,9 +8,11 @@
 
 #include "message.hpp"
 
+#include <iostream>
 #include <stdexcept>
 
 #include "ack.hpp"
+#include "commondefs.hpp"
 #include "directory.hpp"
 #include "get.hpp"
 #include "kill.hpp"

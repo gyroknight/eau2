@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 
+#include "commondefs.hpp"
 #include "message.hpp"
 
 class Directory : public Message {

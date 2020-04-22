@@ -78,8 +78,5 @@ int main(int argc, char* argv[]) {
     // std::cout << translatedDF->getInt(1, 0);
     // std::cout << translatedDF->getInt(1, 1);
 
-    // Delay to let network and store shut down
-    std::this_thread::sleep_for(std::chrono::seconds(120));
-
     return 0;
 }

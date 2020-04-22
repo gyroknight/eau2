@@ -38,7 +38,6 @@ KVStore::KVStore(KVNet& kvNet, const char* address, const char* port)
 
 // Shuts down listener and destroys the KVStore
 KVStore::~KVStore() {
-    _readyGuard();
     auto msg = std::make_shared<Kill>(_idx, _idx);
     _kvNet.send(msg);
     _listener.join();
@@ -139,6 +138,7 @@ void KVStore::_listen(const char* address, const char* port) {
                     break;
                 case MsgKind::Kill:
                     listening = false;
+                    _kvNet.shutdown();
                     break;
                 default:
                     std::cerr
@@ -150,8 +150,6 @@ void KVStore::_listen(const char* address, const char* port) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
-
-    _kvNet.shutdown();
 }
 
 void KVStore::_postReply(std::shared_ptr<Reply> reply) {

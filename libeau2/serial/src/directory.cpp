@@ -10,6 +10,8 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
+#include <iterator>
 
 #include "serializer.hpp"
 

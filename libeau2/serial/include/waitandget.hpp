@@ -12,7 +12,9 @@
 #include <memory>
 #include <vector>
 
+#include "commondefs.hpp"
 #include "get.hpp"
+#include "message.hpp"
 
 class Key;
 
