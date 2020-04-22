@@ -54,7 +54,7 @@ std::unique_ptr<std::vector<uint8_t>> Get::serialize() {
 
 std::unique_ptr<Message> Get::deserializeAs(BStreamIter start,
                                             BStreamIter end) {
-    if (std::distance(start, end) < 2 * sizeof(uint64_t)) {
+    if (std::distance(start, end) < static_cast<int>(2 * sizeof(uint64_t))) {
         std::cerr << "Get data is too small\n";
         return nullptr;
     }

@@ -46,7 +46,8 @@ std::unique_ptr<std::vector<uint8_t>> Register::serialize() {
 
 std::unique_ptr<Message> Register::deserializeAs(BStreamIter start,
                                                  BStreamIter end) {
-    if (std::distance(start, end) < sizeof(uint32_t) + sizeof(uint16_t)) {
+    if (std::distance(start, end) <
+        static_cast<int>(sizeof(uint32_t) + sizeof(uint16_t))) {
         std::cerr << "Register data is too small\n";
         return nullptr;
     }

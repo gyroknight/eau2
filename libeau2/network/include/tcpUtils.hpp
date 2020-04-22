@@ -101,7 +101,7 @@ inline ssize_t sendPacket(int socket,
     bytesLeft -= sent;
 
     // Send rest of data
-    while (totalSent < packet->size()) {
+    while (totalSent < static_cast<ssize_t>(packet->size())) {
         sent = send(socket, packet->data() + totalSent,
                     packet->size() - totalSent, 0);
         if (sent == -1) break;
@@ -120,7 +120,7 @@ inline ssize_t recvData(int socket, void* buf, size_t bytes) {
 
     uint8_t* dataStart = static_cast<uint8_t*>(buf);
 
-    while (totalRecvd < bytes) {
+    while (totalRecvd < static_cast<ssize_t>(bytes)) {
         recvd = recv(socket, dataStart + totalRecvd, bytesLeft, 0);
         if (recvd == -1 || recvd == 0) break;
         totalRecvd += recvd;

@@ -60,6 +60,8 @@ void KVStore::insert(const Key& key, DFPtr value) {
     _cv.notify_all();
 }
 
+// Waits for data of a given key to become available, if it doesn't within the
+// timeout period, the data cannot be found
 DFPtr KVStore::waitAndGet(const Key& key) {
     std::shared_lock<std::shared_mutex> lock(_storeMutex);
 
@@ -78,6 +80,8 @@ DFPtr KVStore::waitAndGet(const Key& key) {
     }
 }
 
+// Attempts to fetch a remote DataFrame, can wait for data to become available
+// if not present
 void KVStore::fetch(const Key& key, bool wait) {
     _readyGuard();
     if (key.home() != _idx) {
@@ -96,6 +100,8 @@ void KVStore::fetch(const Key& key, bool wait) {
     }
 }
 
+// Places a DataFrame at the given Key, either locally if Key matches current
+// index, or sends it remotely to its home
 void KVStore::push(const Key& key, DFPtr value) {
     _readyGuard();
     if (key.home() == _idx) {
@@ -105,6 +111,7 @@ void KVStore::push(const Key& key, DFPtr value) {
     }
 }
 
+// Polling logic that processes received messages from the network
 void KVStore::_listen(const char* address, const char* port) {
     _idx = _kvNet.registerNode(address, port);
     bool listening = true;
@@ -119,6 +126,12 @@ void KVStore::_listen(const char* address, const char* port) {
                       << " with type "
                       << std::to_string(Message::msgKindToValue(msg->kind()))
                       << std::endl;
+
+            if (msg->sender() == 0 && msg->kind() != MsgKind::Kill) {
+                std::cerr << "Warning: Non-Kill Message received from index 0, "
+                             "reserved for registrar\n";
+            }
+
             switch (msg->kind()) {
                 case MsgKind::Put:
                     // Temp code, for now we accept values without
@@ -203,6 +216,8 @@ void KVStore::_startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg) {
     thread.detach();
 }
 
+// We wait for the network to be online and check that the index was properly
+// set. 0 is a reserved value for the registrar, so the new index must not be 0
 void KVStore::_readyGuard() {
     if (!_kvNet.ready()) throw std::runtime_error("Network is not ready");
     while (_idx == 0) {

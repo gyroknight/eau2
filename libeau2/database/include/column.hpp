@@ -29,8 +29,10 @@ class ColumnInterface {
     /** Returns the column as a string "1, 2, 3, 4" */
     virtual std::string str() const = 0;
 
+    //! Serializes the given Column
     virtual void serialize(Serializer& ss) const = 0;
 
+    //! Checks if the Column contains serializable types
     virtual bool canSerialize() const = 0;
 };
 
@@ -75,8 +77,10 @@ class Column : public ColumnInterface {
     /** Returns the column as a string "1, 2, 3, 4" */
     std::string str() const override;
 
+    //! Serializes the given Column
     void serialize(Serializer& ss) const override;
 
+    //! Checks if the Column contains serializable types
     bool canSerialize() const override;
 };
 

@@ -14,11 +14,13 @@
 Schema::Schema(const Schema& from)
     : _rowNames(from._rowNames),
       _colNames(from._colNames),
-      _colTypes(from._colTypes) {}
+      _colTypes(from._colTypes),
+      _local(from._local),
+      _length(from._length) {}
 
-Schema::Schema() {}
+Schema::Schema() : _local(true) {}
 
-Schema::Schema(const char* types) {
+Schema::Schema(const char* types, bool local) : _local(local) {
     while (*types) {
         addCol(*types);
         types++;
@@ -102,4 +104,12 @@ int Schema::rowIdx(const char* name) const {
 size_t Schema::width() const { return _colNames.size(); }
 
 /** The number of rows */
-size_t Schema::length() const { return _rowNames.size(); }
+size_t Schema::length() const {
+    if (_local) {
+        return _rowNames.size();
+    } else {
+        return _length;
+    }
+}
+
+bool Schema::isLocal() const { return _local; }

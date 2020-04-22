@@ -75,6 +75,9 @@ size_t KVNetTCP::registerNode(const char* address, const char* port) {
     freeaddrinfo(connInfo);
 
     ret = TCP::sendPacket(_sendSocks[0], regMsg.serialize());
+    if (ret == -1) {
+        throw std::runtime_error("Failed send registration");
+    }
 
     // wait for directory
     std::unique_ptr<Message> msg = _readMsg(_sendSocks[0]);
@@ -337,6 +340,7 @@ void KVNetTCP::_sender() {
     ready();
 
     while (_netUp) {
+        // Go to sleep if nothing is waiting to be sent
         std::unique_lock<std::mutex> lock(_sendLock);
         if (_senderCv.wait_for(lock, std::chrono::milliseconds(POLL_TIMEOUT_MS),
                                [this] { return !_sending.empty(); })) {
@@ -483,6 +487,7 @@ void KVNetTCP::_receiver(const char* port) {
     }
 }
 
+// Checks if an address is a known IP in the directory
 bool KVNetTCP::_inDirectory(in_addr_t address) {
     for (struct sockaddr_in& context : _dir) {
         if (context.sin_addr.s_addr == address) {

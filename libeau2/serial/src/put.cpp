@@ -50,7 +50,7 @@ std::unique_ptr<std::vector<uint8_t>> Put::serialize() {
 
 std::unique_ptr<Message> Put::deserializeAs(BStreamIter start,
                                             BStreamIter end) {
-    if (std::distance(start, end) < sizeof(uint64_t)) {
+    if (std::distance(start, end) < static_cast<int>(sizeof(uint64_t))) {
         std::cerr << "Put data is too small\n";
         return nullptr;
     }

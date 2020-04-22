@@ -44,7 +44,8 @@ std::unique_ptr<std::vector<uint8_t>> WaitAndGet::serialize() {
 
 std::unique_ptr<Message> WaitAndGet::deserializeAs(BStreamIter start,
                                                    BStreamIter end) {
-    if (std::distance(start, end) < 2 * sizeof(uint64_t) + sizeof(uint32_t)) {
+    if (std::distance(start, end) <
+        static_cast<int>(2 * sizeof(uint64_t) + sizeof(uint32_t))) {
         std::cerr << "WaitAndGet data is too small\n";
         return nullptr;
     }

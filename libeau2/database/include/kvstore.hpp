@@ -60,6 +60,7 @@ class KVStore {
     // if added before the timeout finishes
     void _startWaitAndGetReply(std::shared_ptr<WaitAndGet> msg);
 
+    // Makes sure that the network is available
     void _readyGuard();
 
    public:

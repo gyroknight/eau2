@@ -60,7 +60,7 @@ std::unique_ptr<std::vector<uint8_t>> Directory::serialize() {
 
 std::unique_ptr<Message> Directory::deserializeAs(BStreamIter start,
                                                   BStreamIter end) {
-    if (std::distance(start, end) < 2 * sizeof(uint64_t)) {
+    if (std::distance(start, end) < static_cast<int>(2 * sizeof(uint64_t))) {
         std::cerr << "Directory data too small\n";
         return nullptr;
     }
@@ -71,7 +71,7 @@ std::unique_ptr<Message> Directory::deserializeAs(BStreamIter start,
     start += sizeof(uint64_t);
 
     if (std::distance(start, end) !=
-        nodes * (sizeof(uint32_t) + sizeof(uint16_t))) {
+        static_cast<ssize_t>(nodes * (sizeof(uint32_t) + sizeof(uint16_t)))) {
         std::cerr << "Unexpected Directory size\n";
         return nullptr;
     }

@@ -35,9 +35,12 @@ class DataFrame {
    private:
     Schema _schema;  // specifies the layout of the dataframe
     std::vector<std::shared_ptr<ColumnInterface>>
-        _data;   // columns of data in schema order
-    bool local;  // Defines whether the DataFrame's contents are local or not
-                 // (DataFrame of DataFrames or local storage)
+        _data;    // columns of data in schema order
+    bool _local;  // Defines whether the DataFrame's contents are local or not
+                  // (DataFrame of DataFrames or local storage)
+    KVStore* _kv = nullptr;  // Reference to KV store for remote DataFrames
+    size_t
+        _blkSize;  // Size of each keyed DataFrame block for remote DataFrames
 
     // Returns the value as the type specified, throws exception if invalid
     template <typename T>
@@ -49,13 +52,17 @@ class DataFrame {
     template <typename T>
     static void fillColumn(ColPtr<T> col, T* arr, size_t size);
 
+    // Used for filling remote DataFrame directories
+    template <typename T>
+    void _addRemoteCol(ColPtr<T> col);
+
    public:
     // Creates an empty DataFrame
     DataFrame();
 
     /** Create a data frame from a schema and columns. All columns are created
      * empty. */
-    DataFrame(const Schema& schema);
+    DataFrame(const Schema& schema, bool local = true);
 
     /**
      * Copy constructor - Create a data frame with the same columns as the given
@@ -163,8 +170,19 @@ class DataFrame {
     static void fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set);
 
     /**
+     * @brief Creates a remote DataFrame out of a SoRer file and distributes
+     * local blocks across KV store
+     *
+     * @param filename
+     * @param key
+     * @param kv
+     * @return DFPtr
+     */
+    static DFPtr fromFile(const char* filename, const Key& key, KVStore* kv);
+
+    /**
      * @brief Mostly for debugging.
-     * 
+     *
      */
     void print();
 };

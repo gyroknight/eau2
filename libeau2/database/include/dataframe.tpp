@@ -16,10 +16,14 @@
  * name is optional and external. A nullptr colum is undefined. */
 template <typename T>
 inline void DataFrame::addCol(ColPtr<T> col, ExtString name) {
-    if (_schema.addCol(*col, name))
-        _data.push_back(col);
-    else
-        throw std::invalid_argument("col");
+    if (_local) {
+        if (_schema.addCol(*col, name))
+            _data.push_back(col);
+        else
+            throw std::invalid_argument("col");
+    } else {
+        _addRemoteCol(col);
+    }
 }
 
 template <typename T>
@@ -59,3 +63,17 @@ template <typename T>
 inline void DataFrame::fromScalar(Key* key, KVStore* kv, T value) {
     fromArray(key, kv, 1, &value);
 }
+
+// Remote DataFrame directories consist of 2 Columns only, the first
+// representing the name of each Key, and the second holding the home index for
+// each Key
+template <typename T>
+inline void DataFrame::_addRemoteCol(ColPtr<T> col) {
+    std::cerr << "DataFrame is remote, cannot add addition Columns\n";
+}
+
+template <>
+void DataFrame::_addRemoteCol(ColPtr<int64_t> col);
+
+template <>
+void DataFrame::_addRemoteCol(ColPtr<ExtString> col);

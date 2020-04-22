@@ -204,14 +204,14 @@ class Linus : public Application {
         Key cK("comts");
         if (index == 0) {
             pln("Reading...");
-            projects = DataFrame::fromFile(PROJ, pK.clone(), &kv);
+            projects = DataFrame::fromFile(PROJ, pK, &kv);
             p("    ").p(projects->nrows()).pln(" projects");
-            users = DataFrame::fromFile(USER, uK.clone(), &kv);
+            users = DataFrame::fromFile(USER, uK, &kv);
             p("    ").p(users->nrows()).pln(" users");
-            commits = DataFrame::fromFile(COMM, cK.clone(), &kv);
+            commits = DataFrame::fromFile(COMM, cK, &kv);
             p("    ").p(commits->nrows()).pln(" commits");
             // This dataframe contains the id of Linus.
-            DataFrame::fromScalarInt(new Key("users-0-0"), &kv, LINUS);
+            DataFrame::fromScalar(Key("users-0-0"), &kv, LINUS);
         } else {
             projects = kv.waitAndGet(pK);
             users = kv.waitAndGet(uK);

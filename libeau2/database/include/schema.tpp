@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+// For remote Schemas, the size of the Column doesn't matter since length is not
+// tied to an actual Column
 template <typename T>
 inline bool Schema::addCol(const Column<T>& col, ExtString name) {
     const char colType = colToType(col);
@@ -18,7 +20,7 @@ inline bool Schema::addCol(const Column<T>& col, ExtString name) {
 
     if (_rowNames.empty()) _rowNames.resize(col.size());
 
-    if (_rowNames.size() != col.size()) {
+    if (_rowNames.size() != col.size() && _local) {
         std::cerr << "Column does not match schema length" << std::endl;
         return false;
     }

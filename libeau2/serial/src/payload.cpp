@@ -104,7 +104,7 @@ BStreamIter Payload::deserialize(BStreamIter start, BStreamIter end) {
     start += sizeof(uint64_t);
 
     // Get this Payload's data
-    if (std::distance(start, end) < dataSize)
+    if (std::distance(start, end) < static_cast<ssize_t>(dataSize))
         throw std::invalid_argument("Invalid Payload data");
     _data = std::vector<uint8_t>(start, start + dataSize);
     start += dataSize;

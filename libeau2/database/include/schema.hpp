@@ -31,6 +31,9 @@ class Schema {
     std::vector<ExtString> _rowNames;  // names of rows
     std::vector<ExtString> _colNames;  // names of columns
     std::vector<char> _colTypes;       // types of columns
+    bool _local;     // does this Schema correspond to local data?
+    size_t _length;  // if Schema is remote, is the total length of the
+                     // distributed DataFrame
 
    public:
     /** Copying constructor */
@@ -43,7 +46,7 @@ class Schema {
      * characters other than those identifying the four type results in
      * undefined behavior. The argument is external, a nullptr argument is
      * undefined. **/
-    Schema(const char* types);
+    Schema(const char* types, bool local = true);
 
     /** Add a column of the given type and name (can be nullptr), name
      * is external. Names are expectd to be unique, duplicates result
@@ -87,6 +90,9 @@ class Schema {
 
     template <typename T>
     static char colToType(const Column<T>& col);
+
+    //! Locality of Schema
+    bool isLocal() const;
 };
 
 #include "schema.tpp"

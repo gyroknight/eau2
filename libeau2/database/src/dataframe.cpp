@@ -22,34 +22,44 @@
 #include "schema.hpp"
 #include "sorer/column.h"  // from 4500ne
 
-DataFrame::DataFrame() : DataFrame(Schema()) {}
+// Default constructor is a local DataFrame
+DataFrame::DataFrame() : DataFrame(Schema(), true) {}
 
 /** Create a data frame with the same columns as the given df but with no
  * rows or rownmaes */
-DataFrame::DataFrame(const DataFrame& df) : DataFrame(df._schema) {}
+DataFrame::DataFrame(const DataFrame& df) : DataFrame(df._schema, df._local) {}
 
 /** Create a data frame from a schema and columns. All columns are created
  * empty. */
-DataFrame::DataFrame(const Schema& schema) : _schema(schema) {
-    _data.reserve(schema.width());
-    char type;
-    for (size_t ii = 0; ii < schema.width(); ii++) {
-        type = schema.colType(ii);
-        switch (type) {
-            case 'I':
-                _data.push_back(std::make_shared<Column<int>>());
-                break;
-            case 'B':
-                _data.push_back(std::make_shared<Column<bool>>());
-                break;
-            case 'D':
-                _data.push_back(std::make_shared<Column<double>>());
-                break;
-            case 'S':
-                _data.push_back(std::make_shared<Column<ExtString>>());
-                break;
-            default:
-                throw std::invalid_argument("Unsupported type");
+DataFrame::DataFrame(const Schema& schema, bool local)
+    : _schema(schema), _local(local) {
+    if (_local) {
+        _data.reserve(schema.width());
+        char type;
+        for (size_t ii = 0; ii < schema.width(); ii++) {
+            type = schema.colType(ii);
+            switch (type) {
+                case 'I':
+                    _data.push_back(std::make_shared<Column<int>>());
+                    break;
+                case 'B':
+                    _data.push_back(std::make_shared<Column<bool>>());
+                    break;
+                case 'D':
+                    _data.push_back(std::make_shared<Column<double>>());
+                    break;
+                case 'S':
+                    _data.push_back(std::make_shared<Column<ExtString>>());
+                    break;
+                default:
+                    throw std::invalid_argument("Unsupported type");
+            }
+        }
+    } else {
+        _data.reserve(2);
+        if (schema.isLocal()) {
+            throw std::invalid_argument(
+                "Remote DataFrame must have remote Schema");
         }
     }
 }
@@ -295,8 +305,31 @@ void DataFrame::fromColumnSet(Key* key, KVStore* kv, ne::ColumnSet* set) {
     kv->push(*key, df);
 }
 
+// To be implemented, will use the 4500NE parser
+DFPtr fromFile(const char* filename, const Key& key, KVStore* kv) {
+    return nullptr;
+}
+
 void DataFrame::print() {
     for (size_t i = 0; i < ncols(); i++) {
         std::cout << "Column " << i << ": " << _data.at(i)->str() << std::endl;
+    }
+}
+
+template <>
+void DataFrame::_addRemoteCol(ColPtr<int64_t> col) {
+    if (_data.size() != 1 || col->size() != _data[0]->size()) {
+        std::cerr << "Invalid home Column for remote DataFrame\n";
+    } else {
+        _data.push_back(col);
+    }
+}
+
+template <>
+void DataFrame::_addRemoteCol(ColPtr<ExtString> col) {
+    if (!_data.empty() || col->size() * _blkSize < _schema.length()) {
+        std::cerr << "Invalid name Column for remote DataFrame\n";
+    } else {
+        _data.push_back(col);
     }
 }

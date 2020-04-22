@@ -83,6 +83,7 @@ std::string Column<T>::str() const {
     return ss.str();
 }
 
+// Encodes Column in Payload format and adds to Serializer
 template <typename T>
 void Column<T>::serialize(Serializer& ss) const {
     Payload colData;
@@ -90,6 +91,7 @@ void Column<T>::serialize(Serializer& ss) const {
     colData.serialize(ss);
 }
 
+// Makes sure the Column is not empty and contains a trivially serializable type
 template <typename T>
 bool Column<T>::canSerialize() const {
     return size() != 0 && Serial::canSerializeTrivially(get(0));

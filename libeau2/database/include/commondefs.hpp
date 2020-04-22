@@ -28,4 +28,5 @@ using ColPtr = std::shared_ptr<Column<T>>;
 
 using ColIPtr = std::shared_ptr<ColumnInterface>;
 
+// Bytestream iterator
 using BStreamIter = std::vector<uint8_t>::iterator;
