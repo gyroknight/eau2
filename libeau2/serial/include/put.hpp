@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "commondefs.hpp"
+#include "key.hpp"
 #include "message.hpp"
 
 class Key;
@@ -20,7 +21,7 @@ class Key;
 // Puts data from one node to another, ranging from entire DFs to single items
 class Put : public Message {
    private:
-    const Key& _key;
+    const Key _key;
     DFPtr _value;
     uint64_t _colIdx;
     uint64_t _rowIdx;

@@ -80,4 +80,6 @@ class KVNetTCP : public KVNet {
     std::unique_ptr<Message> receive() override;
 
     bool ready() override;
+
+    void shutdown() override;
 };

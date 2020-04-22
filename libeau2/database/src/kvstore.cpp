@@ -27,7 +27,7 @@
 
 namespace {
 constexpr size_t WAIT_GET_TIMEOUT_S =
-    600;  // How long to wait for network responses before failing in seconds
+    60;  // How long to wait for network responses before failing in seconds
 }  // namespace
 
 // Constructs a KVStore using the communication layer provided
@@ -38,6 +38,7 @@ KVStore::KVStore(KVNet& kvNet, const char* address, const char* port)
 
 // Shuts down listener and destroys the KVStore
 KVStore::~KVStore() {
+    _readyGuard();
     auto msg = std::make_shared<Kill>(_idx, _idx);
     _kvNet.send(msg);
     _listener.join();
@@ -150,7 +151,7 @@ void KVStore::_listen(const char* address, const char* port) {
         }
     }
 
-    _kvNet.~KVNet();
+    _kvNet.shutdown();
 }
 
 void KVStore::_postReply(std::shared_ptr<Reply> reply) {
@@ -166,7 +167,7 @@ void KVStore::_postReply(std::shared_ptr<Reply> reply) {
             case MsgKind::WaitAndGet:
                 getMsg = std::dynamic_pointer_cast<Get>(msg);
                 if (reply->payload()->type() == Serial::Type::DataFrame) {
-                    // insert(getMsg->key(), reply->payload()->asDataFrame());
+                    insert(getMsg->key(), reply->payload()->asDataFrame());
                 } else {
                     // Not sure what we'll use Get for that aren't dataframes
                 }

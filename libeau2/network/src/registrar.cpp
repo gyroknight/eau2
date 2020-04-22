@@ -23,7 +23,7 @@
 
 namespace {
 constexpr const char* PORT = "4500";
-constexpr size_t NUM_NODES = 2;
+constexpr size_t NUM_NODES = 3;
 constexpr size_t MAX_EVENTS = 10;
 }  // namespace
 
@@ -156,10 +156,10 @@ int main(int argc, char* argv[]) {
 
     registrar.start();
 
-    while (true) {
-        usleep(1);
-    }
-    sleep(60);
+    // while (true) {
+    //     usleep(1);
+    // }
+    sleep(15);
 
     registrar.stop();
 

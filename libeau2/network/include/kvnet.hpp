@@ -46,4 +46,6 @@ class KVNet {
      * @return false
      */
     virtual bool ready() = 0;
+
+    virtual void shutdown() = 0;
 };

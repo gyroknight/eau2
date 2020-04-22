@@ -36,13 +36,7 @@ constexpr int POLL_TIMEOUT_MS = 500;
 
 KVNetTCP::KVNetTCP() {}
 KVNetTCP::~KVNetTCP() {
-    std::cerr << "Shutting down network\n";
-    // Net is down
-    _netUp = false;
-
-    // Wait for sender and receiver to stop
-    if (_senderThread.joinable()) _senderThread.join();
-    if (_receiverThread.joinable()) _receiverThread.join();
+    if (_netUp) shutdown();
 }
 
 // Registers node with the registrar and awaits directory before starting sender
@@ -107,10 +101,8 @@ void KVNetTCP::send(std::shared_ptr<Message> msg) {
         const std::lock_guard<std::mutex> lock(_receiveLock);
         _receiving.push(std::move(msgCopy));
     } else {
-        // const std::lock_guard<std::mutex> lock(_sendLock);
-        _sendLock.lock();
+        const std::lock_guard<std::mutex> lock(_sendLock);
         _sending.push(msg);
-        _sendLock.unlock();
         _senderCv.notify_all();
     }
 }
@@ -128,6 +120,9 @@ std::unique_ptr<Message> KVNetTCP::receive() {
 }
 
 bool KVNetTCP::ready() {
+    static std::atomic_bool wasReady = false;
+
+    if (wasReady) return _netUp;
     // if (!_netUp) {
     //     std::this_thread::sleep_for(std::chrono::milliseconds(POLL_TIMEOUT_MS));
     // }
@@ -137,7 +132,20 @@ bool KVNetTCP::ready() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+    wasReady = wasReady || _netUp;
+
     return _netUp;
+}
+
+void KVNetTCP::shutdown() {
+    std::cout << "Shutting down network...";
+    // Net is down
+    _netUp = false;
+
+    // Wait for sender and receiver to stop
+    _senderThread.join();
+    _receiverThread.join();
+    std::cout << " done." << std::endl;
 }
 
 // Reads in Message bytestream from node and deserializes
@@ -217,6 +225,8 @@ ssize_t KVNetTCP::_readPayload(int sock, std::vector<uint8_t>& msg) {
             return ret;
         }
 
+        payloadsLeft--;
+
         if (newPayloadsLeft) {
             pending.push(payloadsLeft);
             payloadsLeft = newPayloadsLeft;
@@ -235,8 +245,7 @@ ssize_t KVNetTCP::_readPayload(int sock, std::vector<uint8_t>& msg) {
 ssize_t KVNetTCP::_readPut(int sock, std::vector<uint8_t>& msg) {
     ssize_t ret;
 
-    // Get WaitAndGet additional info plus Key idx
-    if ((ret = TCP::recvData(sock, msg, 16))) {
+    if ((ret = TCP::recvData(sock, msg, 2 * sizeof(uint64_t)))) {
         std::cerr << "Failed to get Put data\n";
         return ret;
     }
@@ -333,45 +342,46 @@ void KVNetTCP::_sender() {
         std::unique_lock<std::mutex> lock(_sendLock);
         if (_senderCv.wait_for(lock, std::chrono::milliseconds(POLL_TIMEOUT_MS),
                                [this] { return !_sending.empty(); })) {
-            // Send a pending Message
-            std::shared_ptr<Message> msg = _sending.front();
-            _sending.pop();
+            while (!_sending.empty()) {
+                // Send all pending Messages
+                std::shared_ptr<Message> msg = _sending.front();
+                _sending.pop();
 
-            uint64_t target = msg->target();
+                uint64_t target = msg->target();
 
-            if (!_sendSocks.count(target)) {
-                // No existing connection, create socket
-                char connIP[INET_ADDRSTRLEN];
-                auto connPort = std::to_string(htons(_dir[target].sin_port));
+                if (!_sendSocks.count(target)) {
+                    // No existing connection, create socket
+                    char connIP[INET_ADDRSTRLEN];
+                    auto connPort =
+                        std::to_string(htons(_dir[target].sin_port));
 
-                struct addrinfo* connAddrinfo = TCP::generateAddrinfo(
-                    connPort.c_str(),
-                    inet_ntop(AF_INET, &(_dir[target].sin_addr), connIP,
-                              sizeof(connIP)));
+                    struct addrinfo* connAddrinfo = TCP::generateAddrinfo(
+                        connPort.c_str(),
+                        inet_ntop(AF_INET, &(_dir[target].sin_addr), connIP,
+                                  sizeof(connIP)));
 
-                _sendSocks[target] = TCP::createSocket(connAddrinfo);
+                    _sendSocks[target] = TCP::createSocket(connAddrinfo);
 
-                if (connect(_sendSocks[target], connAddrinfo->ai_addr,
-                            connAddrinfo->ai_addrlen) == -1) {
-                    close(_sendSocks[target]);
+                    if (connect(_sendSocks[target], connAddrinfo->ai_addr,
+                                connAddrinfo->ai_addrlen) == -1) {
+                        close(_sendSocks[target]);
+                        freeaddrinfo(connAddrinfo);
+                        std::cerr << "Failed to connect to node " << target
+                                  << '\n';
+                        throw std::runtime_error("Unable to connect to node");
+                    }
+
                     freeaddrinfo(connAddrinfo);
-                    std::cerr << "Failed to connect to node " << target << '\n';
-                    throw std::runtime_error("Unable to connect to node");
                 }
 
-                freeaddrinfo(connAddrinfo);
-            }
+                if (TCP::sendPacket(_sendSocks[target], msg->serialize())) {
+                    throw std::runtime_error("Failed to send Message");
+                }
 
-            if (TCP::sendPacket(_sendSocks[target], msg->serialize())) {
-                throw std::runtime_error("Failed to send Message");
+                std::cout << "Network message sent: " << msg->sender() << " -> "
+                          << msg->target() << std::endl;
             }
-
-            std::cout << "Network message sent: " << msg->sender() << " -> "
-                      << msg->target() << std::endl;
         }
-
-        lock.release();
-        // Might want a sleep here to prevent lock from reacquiring too fast
     }
 }
 
@@ -399,6 +409,13 @@ void KVNetTCP::_receiver(const char* port) {
     }
     sockfds.push_back(epollfd);
     std::cout << "epoll socket is " << epollfd << std::endl;
+
+    ev.events = EPOLLIN;
+    ev.data.fd = _sendSocks[0];
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, _sendSocks[0], &ev) == -1) {
+        throw std::runtime_error("Failed to add registrar socket to epoll");
+    }
+    sockfds.push_back(_sendSocks[0]);
 
     int readyfds;
     struct sockaddr_storage connAddr;
@@ -435,6 +452,7 @@ void KVNetTCP::_receiver(const char* port) {
                     throw std::runtime_error(
                         "Unable to add connection socket to epoll");
                 sockfds.push_back(connSock);
+                std::cout << "Added new connection " << connSock << std::endl;
             } else {
                 std::unique_ptr<Message> msg = _readMsg(events[ii].data.fd);
 
