@@ -42,7 +42,8 @@ add_custom_target(test2
 )
 
 # PHONY target to run valgrind
-# add_custom_target(valgrind
-#     COMMAND valgrind --leak-check=full --tool=memcheck ./tests/test_main
-#     DEPENDS test_main
-# )
+add_custom_target(valgrind
+    COMMAND valgrind --leak-check=full --tool=memcheck "$<TARGET_FILE:libeau2_test>"
+    DEPENDS libeau2_test
+    WORKING_DIRECTORY "$<TARGET_FILE_DIR:libeau2_test>"
+)
