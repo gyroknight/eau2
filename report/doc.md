@@ -156,12 +156,10 @@ The code for this example can be found in the `demo/` directory.
 - Codebase was restructed for a proper C++ project.
 - Parsing .sor files into DataFrames works. The test for this was disabled because the net code will not die.
 - DataFrame methods work in isolation
-- Most of the network is implemented, but the final pieces to make it all come together are missing.
-- Our demo doesn't work, because of the lack of networking.
+- The TCP network is implemented.
+- The M3 demo works.
 - KVStores work as expected
 - Serialization is working for pretty much everything
 - Testing needs to be improved:
     - We are missing unit tests for some classes.
-    - We are missing more elaborate application-layer tests.
-    - There are some tests which segfault, and are commented out
 - There's a bit of inconsistency in the codebase regarding style and ownership.
